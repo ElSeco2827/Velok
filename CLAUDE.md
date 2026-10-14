@@ -4,8 +4,9 @@ App de gimnasio para el seguimiento de sesiones de entrenamiento. Proyecto escol
 vistas, capas (arquitectura), modelo de negocio, multiplataforma y funcionalidad.
 
 ## Flujo de trabajo
-- Trabajar en ramas `feature/*`; **nunca** hacer commits directamente en `main`.
-- Commits pequeños y descriptivos, en español.
+- Claude Code no ejecuta comandos de git que modifiquen el repositorio (add, commit, push, pull, checkout, merge, reset). Solo puede usar git status, git diff y git log para consultar. Al terminar una tarea, sugiere un mensaje de commit y el usuario hace el commit y el push manualmente.
+- Los mensajes de commit sugeridos son breves, descriptivos y en español.
+- El desarrollo se hace en ramas `feature/*`; `main` no recibe cambios directos.
 - Antes de terminar, compilar con `./gradlew :androidApp:assembleDebug` y correr `./gradlew :shared:testAndroidHostTest`.
 - No incluir claves de API ni datos sensibles. Las claves futuras (ExerciseDB) van en `local.properties` (ignorado por git).
 - Finales de línea LF (ver `.gitattributes`); se trabaja desde Windows y Mac.
