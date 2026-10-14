@@ -1,4 +1,4 @@
-package com.example.velok
+package com.velok.app
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image

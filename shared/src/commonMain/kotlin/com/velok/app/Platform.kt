@@ -1,4 +1,4 @@
-package com.example.velok
+package com.velok.app
 
 interface Platform {
     val name: String

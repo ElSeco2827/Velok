@@ -1,4 +1,4 @@
-package com.example.velok
+package com.velok.app
 
 class Greeting {
     private val platform = getPlatform()
