@@ -20,11 +20,11 @@ dependencies {
 }
 
 android {
-    namespace = "com.example.velok"
+    namespace = "com.velok.app"
     compileSdk = libs.versions.android.compileSdk.get().toInt()
 
     defaultConfig {
-        applicationId = "com.example.velok"
+        applicationId = "com.velok.app"
         minSdk = libs.versions.android.minSdk.get().toInt()
         targetSdk = libs.versions.android.targetSdk.get().toInt()
         versionCode = 1

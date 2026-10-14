@@ -1,4 +1,4 @@
-package com.example.velok
+package com.velok.app
 
 import android.os.Build
 

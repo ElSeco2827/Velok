@@ -1,9 +1,9 @@
-package com.example.velok
+package com.velok.app
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
 
-class SharedLogicIOSTest {
+class SharedCommonTest {
 
     @Test
     fun example() {
