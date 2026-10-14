@@ -53,11 +53,14 @@ Reglas:
 ## Tema visual
 - Acento verde lima `#D3FA6E` (`VelokTheme.colores.acento`). Para texto/íconos sobre fondo claro usar
   `acentoTexto` (variante más oscura, por legibilidad).
-- Encabezado negro con esquinas inferiores redondeadas, trazo decorativo lima y campana con punto rojo.
+- Encabezado negro con esquinas inferiores redondeadas, logo de Velok en lima (`logo_velok.xml`,
+  convertido de `docs/diseno/logo_velok.svg`) que se corta en el borde inferior, y campana con punto rojo.
 - Fondo crema en Inicio y placeholders; blanco en Ejercicio. Tarjetas redondeadas con borde sutil.
 - **Nunca** colores, tamaños de fuente ni formas fijos en pantallas/componentes: usar
   `VelokTheme.colores`, `VelokTheme.tipografia`, `VelokTheme.formas` y `VelokTheme.formasVelok`.
   La paleta base (`internal`) solo se usa dentro de `presentation/theme`.
+- Los recursos gráficos del diseño (logos, ilustraciones) se toman de docs/diseno; nunca se redibujan a mano.
+  Los SVG se convierten a vector drawable XML copiando los trazos sin modificarlos.
 - Íconos: vectores XML propios (trazo, 24x24) en `composeResources/drawable`, prefijo `ic_`.
   No usar `material-icons-extended`.
 
