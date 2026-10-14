@@ -1,49 +1,50 @@
 package com.velok.app
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.safeContentPadding
-import androidx.compose.material3.Button
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import org.jetbrains.compose.resources.painterResource
-
-import velok.shared.generated.resources.Res
-import velok.shared.generated.resources.compose_multiplatform
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
+import com.velok.app.presentation.components.VelokBottomBar
+import com.velok.app.presentation.components.VelokHeader
+import com.velok.app.presentation.navigation.DestinoPrincipal
+import com.velok.app.presentation.navigation.VelokNavHost
+import com.velok.app.presentation.navigation.destinoPrincipal
+import com.velok.app.presentation.navigation.navegarA
+import com.velok.app.presentation.theme.VelokTheme
 
 @Composable
-@Preview
 fun App() {
-    MaterialTheme {
-        var showContent by remember { mutableStateOf(false) }
-        Column(
-            modifier = Modifier
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .safeContentPadding()
-                .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-        ) {
-            Button(onClick = { showContent = !showContent }) {
-                Text("Click me!")
-            }
-            AnimatedVisibility(showContent) {
-                val greeting = remember { Greeting().greet() }
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Image(painterResource(Res.drawable.compose_multiplatform), null)
-                    Text("Compose: $greeting")
-                }
-            }
+    VelokTheme {
+        val navController = rememberNavController()
+        val entradaActual by navController.currentBackStackEntryAsState()
+        val destinoActual = entradaActual?.destination.destinoPrincipal()
+
+        // Ejercicio usa fondo blanco; el resto, crema (como en el mockup).
+        val colores = VelokTheme.colores
+        val fondo by animateColorAsState(
+            if (destinoActual == DestinoPrincipal.EJERCICIO) colores.superficie else colores.fondo,
+        )
+
+        Scaffold(
+            containerColor = fondo,
+            contentWindowInsets = WindowInsets(0),
+            topBar = {
+                VelokHeader(tieneNotificaciones = true, onNotificacionesClick = {})
+            },
+            bottomBar = {
+                VelokBottomBar(
+                    destinos = DestinoPrincipal.entries,
+                    seleccionado = destinoActual,
+                    onSeleccionar = navController::navegarA,
+                )
+            },
+        ) { padding ->
+            VelokNavHost(navController = navController, modifier = Modifier.padding(padding))
         }
     }
 }
