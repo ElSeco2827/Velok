@@ -1,0 +1,64 @@
+<resources>
+    <string name="app_name">Velok</string>
+
+    <!-- Navegación -->
+    <string name="nav_inicio">Inicio</string>
+    <string name="nav_calendario">Calendario</string>
+    <string name="nav_ejercicio">Ejercicio</string>
+    <string name="nav_actividad">Actividad</string>
+    <string name="nav_perfil">Perfil</string>
+
+    <!-- Encabezado -->
+    <string name="notificaciones">Notificaciones</string>
+    <string name="notificaciones_pendientes">Tienes notificaciones sin leer</string>
+
+    <!-- Dashboard -->
+    <string name="actividad_diaria">Actividad diaria</string>
+    <string name="progreso_diario">Progreso diario: %1$d %</string>
+    <string name="fecha_completa">%1$d %2$s %3$d</string>
+    <string-array name="meses">
+        <item>Enero</item>
+        <item>Febrero</item>
+        <item>Marzo</item>
+        <item>Abril</item>
+        <item>Mayo</item>
+        <item>Junio</item>
+        <item>Julio</item>
+        <item>Agosto</item>
+        <item>Septiembre</item>
+        <item>Octubre</item>
+        <item>Noviembre</item>
+        <item>Diciembre</item>
+    </string-array>
+    <string name="planes">Planes</string>
+    <string name="ver_todos">Ver todos</string>
+    <string name="plan_ejercicios">%1$d ejercicios</string>
+
+    <!-- Métricas -->
+    <string name="metrica_calorias">Calorías</string>
+    <string name="metrica_pasos">Pasos</string>
+    <string name="metrica_distancia">Distancia</string>
+    <string name="metrica_ritmo_cardiaco">Ritmo cardiaco</string>
+    <string name="valor_calorias">%1$s kcal</string>
+    <string name="valor_pasos">%1$s</string>
+    <string name="valor_distancia">%1$s km</string>
+    <string name="valor_ritmo_cardiaco">%1$s lpm</string>
+
+    <!-- Ejercicio -->
+    <string name="tab_ejercicio">Ejercicio</string>
+    <string name="tab_entrenamiento">Entrenamiento</string>
+    <string name="categoria_pecho">Pecho</string>
+    <string name="categoria_fuerza">Fuerza</string>
+    <string name="categoria_pierna">Pierna</string>
+    <string name="categoria_espalda">Espalda</string>
+    <string name="categoria_brazos">Brazos</string>
+    <string name="categoria_abdomen">Abdomen</string>
+    <string name="categoria_hombros">Hombros</string>
+    <string name="categoria_cardio">Cardio</string>
+
+    <!-- Estados -->
+    <string name="proximamente">Próximamente</string>
+    <string name="plataforma_actual">Ejecutando en %1$s</string>
+    <string name="error_carga">No se pudieron cargar los datos</string>
+    <string name="reintentar">Reintentar</string>
+</resources>
