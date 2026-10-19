@@ -21,3 +21,12 @@ fun formatearDecimal(valor: Double, decimales: Int = 1): String {
     val signo = if (valor < 0 && escalado != 0L) "-" else ""
     return "$signo$entero.$fraccion"
 }
+
+/** Número corto para pesos y horas: 10.0 -> "10", 2.5 -> "2.5", 1234.0 -> "1,234". */
+fun formatearNumero(valor: Double): String = formatearDecimal(valor, 1).removeSuffix(".0")
+
+/** Convierte texto escrito por el usuario a peso: acepta coma o punto; vacío o inválido -> null. */
+fun textoAPeso(texto: String): Double? = texto.replace(',', '.').toDoubleOrNull()?.takeIf { it >= 0 }
+
+/** Convierte texto escrito por el usuario a repeticiones; vacío o inválido -> null. */
+fun textoARepeticiones(texto: String): Int? = texto.toIntOrNull()?.takeIf { it >= 0 }

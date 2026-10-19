@@ -19,16 +19,15 @@ import com.velok.app.presentation.theme.VelokTheme
 import org.jetbrains.compose.resources.stringResource
 import velok.shared.generated.resources.Res
 import velok.shared.generated.resources.error_carga
-import velok.shared.generated.resources.nav_perfil
-import velok.shared.generated.resources.proximamente
 import velok.shared.generated.resources.reintentar
+import velok.shared.generated.resources.sin_planes
 
 @Composable
 fun EstadoCargando(modifier: Modifier = Modifier) {
     Box(modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         CircularProgressIndicator(
-            color = VelokTheme.colores.acentoTexto,
-            trackColor = VelokTheme.colores.acentoSuave,
+            color = VelokTheme.colores.acento,
+            trackColor = VelokTheme.colores.superficieOscura,
         )
     }
 }
@@ -43,7 +42,7 @@ fun EstadoError(onReintentar: () -> Unit, modifier: Modifier = Modifier) {
         Text(
             text = stringResource(Res.string.error_carga),
             style = VelokTheme.tipografia.bodyMedium,
-            color = VelokTheme.colores.textoPrincipal,
+            color = VelokTheme.colores.sobreFondo,
             textAlign = TextAlign.Center,
         )
         Button(
@@ -58,43 +57,23 @@ fun EstadoError(onReintentar: () -> Unit, modifier: Modifier = Modifier) {
     }
 }
 
-/** Pantalla provisional para secciones que aún no se implementan. */
+/** Mensaje centrado para listas vacías o elementos que no existen. */
 @Composable
-fun PlaceholderScreen(
-    titulo: String,
-    modifier: Modifier = Modifier,
-    detalle: String? = null,
-) {
-    Column(
-        modifier = modifier.fillMaxSize().padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(8.dp, Alignment.CenterVertically),
-    ) {
+fun EstadoVacio(mensaje: String, modifier: Modifier = Modifier) {
+    Box(modifier.fillMaxSize().padding(24.dp), contentAlignment = Alignment.Center) {
         Text(
-            text = titulo,
-            style = VelokTheme.tipografia.titleLarge,
-            color = VelokTheme.colores.textoPrincipal,
-        )
-        Text(
-            text = stringResource(Res.string.proximamente),
+            text = mensaje,
             style = VelokTheme.tipografia.bodyMedium,
-            color = VelokTheme.colores.textoSecundario,
+            color = VelokTheme.colores.sobreFondoSecundario,
+            textAlign = TextAlign.Center,
         )
-        if (detalle != null) {
-            Text(
-                text = detalle,
-                style = VelokTheme.tipografia.labelLarge,
-                color = VelokTheme.colores.acentoTexto,
-                textAlign = TextAlign.Center,
-            )
-        }
     }
 }
 
 @Preview
 @Composable
-private fun PlaceholderScreenPreview() {
+private fun EstadoVacioPreview() {
     VelokTheme {
-        PlaceholderScreen(titulo = stringResource(Res.string.nav_perfil), detalle = "Ejecutando en Android 37")
+        EstadoVacio(stringResource(Res.string.sin_planes))
     }
 }

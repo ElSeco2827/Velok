@@ -28,11 +28,14 @@ Paquete base `com.velok.app`, en `shared/src/commonMain/kotlin/com/velok/app/`:
 
 ```
 domain/        Kotlin puro: sin Compose, sin recursos, sin textos visibles
-  model/       ActividadDiaria, Metrica (+TipoMetrica), Plan, CategoriaEjercicio (+TipoCategoria)
-  repository/  Interfaces (ActividadRepository, EjercicioRepository)
-  usecase/     Un caso de uso por clase, con `suspend operator fun invoke()`
+  model/       Entidades (Plan, Ejercicio, SesionEntrenamiento, Metrica...) y sus reglas como
+               funciones puras que devuelven copias (EdicionPlan.kt, SesionEntrenamiento.kt)
+  calculo/     Estadísticas puras a partir del historial (progreso, horas por semana, músculos)
+  repository/  Interfaces (Actividad, Ejercicio, Plan, Sesion, Usuario)
+  usecase/     Un caso de uso por clase con `operator fun invoke()` (`suspend` o que devuelve `Flow`)
 data/
-  repository/  Implementaciones (hoy Mock*; luego Health Connect/HealthKit y ExerciseDB)
+  repository/  Implementaciones (hoy Mock*, con datos en DatosMock.kt; luego Health Connect/HealthKit
+               y ExerciseDB). Planes e historial viven en memoria con MutableStateFlow.
 di/            Módulos de Koin (dataModule, domainModule, presentationModule)
 presentation/
   theme/       VelokTheme: colores, tipografía, formas
@@ -46,17 +49,27 @@ Reglas:
 - Las pantallas **nunca** acceden a repositorios: Screen -> ViewModel -> UseCase -> Repository.
 - Cada pantalla tiene dos composables: `XxxScreen` (obtiene el ViewModel con `koinViewModel()`) y
   `XxxContenido(estado, callbacks)` sin estado, que es el que se previsualiza.
-- El dominio usa enums (`TipoMetrica`, `TipoCategoria`); su texto e ícono se resuelven en
-  `presentation/util/RecursosUi.kt`.
+- El dominio usa enums (`TipoMetrica`, `TipoCategoria`, `TipoEquipo`, `Musculo`...); su texto e ícono
+  se resuelven en `presentation/util/RecursosUi.kt`.
+- Las reglas de negocio van en el dominio y se prueban en `commonTest` (sin coroutines ni UI).
+  Los ViewModels solo orquestan: llaman casos de uso o aplican funciones del dominio.
+- Pantallas de detalle: rutas tipadas con id (`RutaDetallePlan(planId)`) y ViewModel creado con
+  `koinViewModel(key = ...) { parametersOf(id) }`.
+- Pantallas con muchos eventos los agrupan en una clase `AccionesXxx` en lugar de muchos parámetros.
 - Código específico de plataforma solo en `androidMain` / `iosMain` vía `expect/actual`.
   `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo.
 
 ## Tema visual
 - Acento verde lima `#D3FA6E` (`VelokTheme.colores.acento`). Para texto/íconos sobre fondo claro usar
   `acentoTexto` (variante más oscura, por legibilidad).
-- Encabezado negro con esquinas inferiores redondeadas, logo de Velok en lima (`logo_velok.xml`,
-  convertido de `docs/diseno/logo_velok.svg`) que se corta en el borde inferior, y campana con punto rojo.
-- Fondo crema en Inicio y placeholders; blanco en Ejercicio. Tarjetas redondeadas con borde sutil.
+- App oscura: fondo `fondo` (#171819) y `fondoProfundo` (#000) en sesión, editor y detalle de
+  ejercicio. Tarjetas claras (`superficie`) con esquinas redondeadas.
+- Encabezado plano con el logo `logo_velok_encabezado.png` (copia sin cambios de
+  `docs/diseno/Header.png`), campana con punto rojo y flecha de "atrás" en pantallas de detalle
+  (iOS no tiene botón de atrás del sistema).
+- Azul `informativo` solo en sesión y editor (nombres de ejercicio en tablas y duración); el resto
+  de gráficas y selectores, incluido el perfil, usan el verde lima `acento`. Ámbar `calentamiento`
+  para las series "W".
 - **Nunca** colores, tamaños de fuente ni formas fijos en pantallas/componentes: usar
   `VelokTheme.colores`, `VelokTheme.tipografia`, `VelokTheme.formas` y `VelokTheme.formasVelok`.
   La paleta base (`internal`) solo se usa dentro de `presentation/theme`.
@@ -77,5 +90,6 @@ Reglas:
 - Repositorios: interfaz `XxxRepository`, implementaciones `MockXxxRepository`, `ApiXxxRepository`, etc.
 - Componentes reutilizables: `XxxCard`, `VelokXxx` para piezas de marca (`VelokHeader`, `VelokBottomBar`).
 - Rutas `RutaXxx` (`data object` serializable).
-- Recursos: `nav_*`, `metrica_*`, `valor_*`, `categoria_*`, `tab_*` para strings; `ic_*` para íconos;
-  `categoria_<tipo>.jpg` para las imágenes de categoría.
+- Recursos: `nav_*`, `metrica_*`, `valor_*`, `categoria_*`, `tab_*`, `equipo_*`, `musculo_*`,
+  `grupo_*`, `rango_*` para strings; `ic_*` para íconos; `categoria_<tipo>.jpg` para las imágenes
+  de categoría.

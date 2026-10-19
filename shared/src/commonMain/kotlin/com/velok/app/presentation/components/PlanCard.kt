@@ -1,6 +1,5 @@
 package com.velok.app.presentation.components
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,30 +8,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.velok.app.domain.model.Plan
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.presentation.theme.VelokTheme
-import com.velok.app.presentation.util.icono
-import com.velok.app.presentation.util.nombre
-import org.jetbrains.compose.resources.painterResource
+import com.velok.app.presentation.util.formatoLargo
+import com.velok.app.presentation.util.nombreVisible
+import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import velok.shared.generated.resources.Res
-import velok.shared.generated.resources.plan_ejercicios
+import velok.shared.generated.resources.plan_minutos
+import velok.shared.generated.resources.plan_series
 
-/** Tarjeta de plan para el carrusel horizontal del Dashboard. */
+/** Tarjeta de plan: imagen con etiqueta de categoría, nombre, fecha, series y duración estimada. */
 @Composable
 fun PlanCard(
     plan: Plan,
@@ -42,45 +40,51 @@ fun PlanCard(
     val colores = VelokTheme.colores
     Surface(
         onClick = onClick,
-        modifier = modifier.width(150.dp),
-        shape = VelokTheme.formas.medium,
+        modifier = modifier,
+        shape = VelokTheme.formas.small,
         color = colores.superficie,
-        border = BorderStroke(1.dp, colores.borde),
     ) {
         Column {
-            Box(Modifier.fillMaxWidth().height(116.dp)) {
+            Box(Modifier.fillMaxWidth().height(122.dp)) {
                 AsyncImage(
                     model = plan.imagenUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
-                    placeholder = ColorPainter(colores.encabezado),
-                    error = ColorPainter(colores.encabezado),
+                    placeholder = ColorPainter(colores.superficieOscura),
+                    error = ColorPainter(colores.superficieOscura),
                     modifier = Modifier.fillMaxSize(),
                 )
-                Row(
-                    modifier = Modifier.padding(10.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Icon(
-                        painter = painterResource(plan.categoria.icono),
-                        contentDescription = null,
-                        tint = colores.acento,
-                        modifier = Modifier.size(14.dp),
-                    )
-                    Spacer(Modifier.width(4.dp))
+                EtiquetaCategoria(plan.categoria, Modifier.padding(8.dp))
+            }
+            Column(Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+                Text(
+                    text = plan.nombreVisible(),
+                    style = VelokTheme.tipografia.titleMedium,
+                    color = colores.textoPrincipal,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+                Text(
+                    text = plan.fecha.formatoLargo(),
+                    style = VelokTheme.tipografia.bodySmall,
+                    color = colores.textoSecundario,
+                )
+                Spacer(Modifier.height(8.dp))
+                Row {
                     Text(
-                        text = stringResource(plan.categoria.nombre),
-                        style = VelokTheme.tipografia.labelSmall,
-                        color = colores.acento,
+                        text = stringResource(Res.string.plan_series, plan.totalSeries),
+                        style = VelokTheme.tipografia.bodySmall,
+                        color = colores.textoPrincipal,
+                        modifier = Modifier.weight(1f),
+                    )
+                    Text(
+                        text = stringResource(Res.string.plan_minutos, plan.duracionEstimadaMinutos),
+                        style = VelokTheme.tipografia.bodySmall,
+                        color = colores.textoPrincipal,
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
-            Text(
-                text = stringResource(Res.string.plan_ejercicios, plan.numeroEjercicios),
-                style = VelokTheme.tipografia.bodySmall,
-                color = colores.textoSecundario,
-                modifier = Modifier.padding(horizontal = 10.dp, vertical = 8.dp),
-            )
         }
     }
 }
@@ -90,8 +94,9 @@ fun PlanCard(
 private fun PlanCardPreview() {
     VelokTheme {
         PlanCard(
-            plan = Plan("plan-pecho", TipoCategoria.PECHO, imagenUrl = "", numeroEjercicios = 8),
+            plan = Plan("plan", "Set del Lunes", TipoCategoria.PECHO, "", LocalDate(2026, 10, 12), emptyList()),
             onClick = {},
+            modifier = Modifier.width(172.dp),
         )
     }
 }
