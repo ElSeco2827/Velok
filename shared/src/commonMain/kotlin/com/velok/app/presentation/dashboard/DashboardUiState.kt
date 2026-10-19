@@ -10,5 +10,4 @@ data class DashboardUiState(
     val actividad: ActividadDiaria? = null,
     val metricas: List<Metrica> = emptyList(),
     val planes: List<Plan> = emptyList(),
-    val tieneNotificaciones: Boolean = true,
 )

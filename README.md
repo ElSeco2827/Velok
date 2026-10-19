@@ -14,8 +14,11 @@ conectarán Health Connect / HealthKit y la API de ExerciseDB sin cambiar la UI.
 
 El diseño de referencia está en [`docs/diseno/`](docs/diseno).
 
-📄 **Documento de avance:** [`docs/AVANCE-01.md`](docs/AVANCE-01.md) explica todo lo implementado,
-la arquitectura, cómo agregar pantallas, el flujo de trabajo con Git y los pendientes.
+📄 **Documentos de avance:**
+- [`docs/AVANCE-01.md`](docs/AVANCE-01.md) (entrega 1): todo lo implementado al inicio, la
+  arquitectura, cómo agregar pantallas, el flujo de trabajo con Git y los pendientes.
+- [`docs/AVANCE-02.md`](docs/AVANCE-02.md) (entrega 2): las pantallas del segundo diseño, el modelo
+  de negocio, las reglas y pruebas nuevas, y los pendientes actualizados.
 
 ## Stack
 

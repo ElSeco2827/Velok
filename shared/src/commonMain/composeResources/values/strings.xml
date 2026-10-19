@@ -3,19 +3,20 @@
 
     <!-- Navegación -->
     <string name="nav_inicio">Inicio</string>
-    <string name="nav_calendario">Calendario</string>
+    <string name="nav_planes">Planes</string>
     <string name="nav_ejercicio">Ejercicio</string>
     <string name="nav_actividad">Actividad</string>
     <string name="nav_perfil">Perfil</string>
+    <string name="atras">Atrás</string>
+    <string name="mas_opciones">Más opciones</string>
 
     <!-- Encabezado -->
     <string name="notificaciones">Notificaciones</string>
     <string name="notificaciones_pendientes">Tienes notificaciones sin leer</string>
 
-    <!-- Dashboard -->
-    <string name="actividad_diaria">Actividad diaria</string>
-    <string name="progreso_diario">Progreso diario: %1$d %</string>
+    <!-- Fechas -->
     <string name="fecha_completa">%1$d %2$s %3$d</string>
+    <string name="fecha_corta">%1$d %2$s</string>
     <string-array name="meses">
         <item>Enero</item>
         <item>Febrero</item>
@@ -30,9 +31,31 @@
         <item>Noviembre</item>
         <item>Diciembre</item>
     </string-array>
+    <string-array name="meses_cortos">
+        <item>ene</item>
+        <item>feb</item>
+        <item>mar</item>
+        <item>abr</item>
+        <item>may</item>
+        <item>jun</item>
+        <item>jul</item>
+        <item>ago</item>
+        <item>sep</item>
+        <item>oct</item>
+        <item>nov</item>
+        <item>dic</item>
+    </string-array>
+
+    <!-- Duraciones -->
+    <string name="duracion_segundos">%1$ds</string>
+    <string name="duracion_minutos">%1$dmin %2$ds</string>
+    <string name="duracion_horas">%1$dh %2$dmin</string>
+
+    <!-- Inicio -->
+    <string name="actividad_diaria">Actividad diaria</string>
+    <string name="progreso_diario">Progreso diario: %1$d %</string>
     <string name="planes">Planes</string>
     <string name="ver_todos">Ver todos</string>
-    <string name="plan_ejercicios">%1$d ejercicios</string>
 
     <!-- Métricas -->
     <string name="metrica_calorias">Calorías</string>
@@ -44,9 +67,68 @@
     <string name="valor_distancia">%1$s km</string>
     <string name="valor_ritmo_cardiaco">%1$s lpm</string>
 
+    <!-- Planes -->
+    <string name="lista_planes">Lista de planes</string>
+    <string name="crear_plan">Crear plan</string>
+    <string name="sin_planes">Aún no tienes planes. Crea uno con el botón +.</string>
+    <string name="plan_sin_nombre">Plan sin nombre</string>
+    <string name="plan_series">%1$d series</string>
+    <string name="plan_minutos">%1$d min</string>
+    <string name="plan_no_encontrado">No se encontró el plan</string>
+    <string name="plan_sin_ejercicios">Este plan no tiene ejercicios. Edítalo para agregar algunos.</string>
+    <string name="editar_plan">Editar plan</string>
+    <string name="iniciar_entrenamiento">Iniciar entrenamiento</string>
+
+    <!-- Editor de plan -->
+    <string name="nombre_plan">Nombre del plan</string>
+    <string name="agregar_ejercicio">Agregar ejercicio</string>
+    <string name="elegir_ejercicio">Elegir ejercicio</string>
+    <string name="eliminar_ejercicio">Eliminar ejercicio</string>
+    <string name="borrar_plan">Borrar plan</string>
+    <string name="borrar_plan_titulo">¿Borrar este plan?</string>
+    <string name="borrar_plan_mensaje">Se eliminará «%1$s». Esta acción no se puede deshacer.</string>
+    <string name="borrar">Borrar</string>
+    <string name="cancelar">Cancelar</string>
+    <string name="cambiar_tipo_serie">Serie %1$s. Toca para cambiar entre normal y calentamiento</string>
+
+    <!-- Series -->
+    <string name="serie">SERIE</string>
+    <string name="anterior">ANTERIOR</string>
+    <string name="kg">KG</string>
+    <string name="reps">REPS</string>
+    <string name="serie_calentamiento">W</string>
+    <string name="valor_anterior">%1$skg x %2$d</string>
+    <string name="sin_valor">-</string>
+    <string name="descanso">Descanso: %1$s</string>
+    <string name="nota">Nota</string>
+    <string name="nota_placeholder">Escribe una nota…</string>
+    <string name="agregar_serie">Agregar serie</string>
+    <string name="marcar_serie">Marcar serie %1$s como completada</string>
+    <string name="desmarcar_serie">Serie %1$s completada. Toca para desmarcar</string>
+
+    <!-- Sesión -->
+    <string name="duracion">Duración</string>
+    <string name="volumen">Volumen</string>
+    <string name="series">Series</string>
+    <string name="volumen_kg">%1$s kg</string>
+    <string name="terminar_entrenamiento">Terminar entrenamiento</string>
+    <string name="salir_sin_guardar_titulo">¿Salir sin guardar?</string>
+    <string name="salir_sin_guardar_mensaje">No completaste ninguna serie, así que este entrenamiento no se guardará.</string>
+    <string name="salir">Salir</string>
+    <string name="seguir_entrenando">Seguir entrenando</string>
+
     <!-- Ejercicio -->
     <string name="tab_ejercicio">Ejercicio</string>
     <string name="tab_entrenamiento">Entrenamiento</string>
+    <string name="equipo_barra">Barra</string>
+    <string name="equipo_pesa">Pesa</string>
+    <string name="equipo_tapete">Tapete</string>
+    <string name="equipo_maquina">Máquina</string>
+    <string name="ejercicio_series">%1$d × %2$d series</string>
+    <string name="sin_ejercicios">No hay ejercicios con este filtro</string>
+    <string name="ejercicio_no_encontrado">No se encontró el ejercicio</string>
+    <string name="primario">Primario: %1$s</string>
+    <string name="secundario">Secundario: %1$s</string>
     <string name="categoria_pecho">Pecho</string>
     <string name="categoria_fuerza">Fuerza</string>
     <string name="categoria_pierna">Pierna</string>
@@ -56,9 +138,51 @@
     <string name="categoria_hombros">Hombros</string>
     <string name="categoria_cardio">Cardio</string>
 
-    <!-- Estados -->
-    <string name="proximamente">Próximamente</string>
+    <!-- Músculos y grupos -->
+    <string name="musculo_pecho">Pecho</string>
+    <string name="musculo_dorsales">Dorsales</string>
+    <string name="musculo_lumbares">Lumbares</string>
+    <string name="musculo_hombros">Hombros</string>
+    <string name="musculo_biceps">Bíceps</string>
+    <string name="musculo_triceps">Tríceps</string>
+    <string name="musculo_antebrazos">Antebrazos</string>
+    <string name="musculo_abdominales">Abdominales</string>
+    <string name="musculo_cuadriceps">Cuádriceps</string>
+    <string name="musculo_isquiotibiales">Isquiotibiales</string>
+    <string name="musculo_gluteos">Glúteos</string>
+    <string name="musculo_pantorrillas">Pantorrillas</string>
+    <string name="grupo_espalda">Espalda</string>
+    <string name="grupo_pecho">Pecho</string>
+    <string name="grupo_core">Core</string>
+    <string name="grupo_hombros">Hombros</string>
+    <string name="grupo_brazos">Brazos</string>
+    <string name="grupo_piernas">Piernas</string>
+
+    <!-- Progreso -->
+    <string name="resumen">Resumen</string>
+    <string name="resumen_info_ejercicio">Muestra cómo cambió tu rendimiento en este ejercicio en cada sesión del periodo elegido.</string>
+    <string name="resumen_info_general">Muestra cómo cambió tu rendimiento en cada sesión del periodo elegido, sumando todos tus ejercicios.</string>
+    <string name="entendido">Entendido</string>
+    <string name="sin_datos_progreso">Aún no hay sesiones en este periodo</string>
+    <string name="metrica_peso">Peso</string>
+    <string name="metrica_volumen">Volumen</string>
+    <string name="metrica_repeticiones">Repeticiones</string>
+    <string name="rango_tres_dias">3 días</string>
+    <string name="rango_semana">7 días</string>
+    <string name="rango_mes">Último mes</string>
+    <string name="rango_tres_meses">Últimos 3 meses</string>
+
+    <!-- Perfil -->
+    <string name="saludo">Hola %1$s</string>
+    <string name="foto_perfil">Foto de perfil</string>
+    <string name="horas_valor">%1$s horas</string>
+    <string name="esta_semana">esta semana</string>
+    <string name="horas_eje">%1$s hrs</string>
+    <string name="grafica_horas">Horas entrenadas por semana</string>
+    <string name="grafica_radar">Series por grupo muscular: %1$s</string>
     <string name="plataforma_actual">Ejecutando en %1$s</string>
+
+    <!-- Estados -->
     <string name="error_carga">No se pudieron cargar los datos</string>
     <string name="reintentar">Reintentar</string>
 </resources>

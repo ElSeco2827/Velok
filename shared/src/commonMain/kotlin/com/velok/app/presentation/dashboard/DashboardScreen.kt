@@ -1,6 +1,5 @@
 package com.velok.app.presentation.dashboard
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -33,24 +32,22 @@ import com.velok.app.domain.model.Metrica
 import com.velok.app.domain.model.Plan
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoMetrica
-import com.velok.app.presentation.components.AnilloProgreso
 import com.velok.app.presentation.components.EstadoCargando
 import com.velok.app.presentation.components.EstadoError
-import com.velok.app.presentation.components.MetricaCard
 import com.velok.app.presentation.components.PlanCard
+import com.velok.app.presentation.components.TarjetaActividadDiaria
 import com.velok.app.presentation.theme.VelokTheme
-import com.velok.app.presentation.util.formatoLargo
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import velok.shared.generated.resources.Res
-import velok.shared.generated.resources.actividad_diaria
 import velok.shared.generated.resources.planes
 import velok.shared.generated.resources.ver_todos
 
 @Composable
 fun DashboardScreen(
     onVerTodosPlanes: () -> Unit,
+    onAbrirPlan: (String) -> Unit,
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
@@ -58,6 +55,7 @@ fun DashboardScreen(
         estado = estado,
         onReintentar = viewModel::cargar,
         onVerTodosPlanes = onVerTodosPlanes,
+        onAbrirPlan = onAbrirPlan,
     )
 }
 
@@ -66,6 +64,7 @@ fun DashboardContenido(
     estado: DashboardUiState,
     onReintentar: () -> Unit,
     onVerTodosPlanes: () -> Unit,
+    onAbrirPlan: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -82,60 +81,8 @@ fun DashboardContenido(
                 metricas = estado.metricas,
                 modifier = Modifier.padding(horizontal = 16.dp),
             )
-            Spacer(Modifier.height(20.dp))
-            SeccionPlanes(planes = estado.planes, onVerTodos = onVerTodosPlanes)
-        }
-    }
-}
-
-@Composable
-private fun TarjetaActividadDiaria(
-    actividad: ActividadDiaria,
-    metricas: List<Metrica>,
-    modifier: Modifier = Modifier,
-) {
-    val colores = VelokTheme.colores
-    Surface(
-        modifier = modifier.fillMaxWidth(),
-        shape = VelokTheme.formas.large,
-        color = colores.superficie,
-        border = BorderStroke(1.dp, colores.borde),
-    ) {
-        Column(Modifier.padding(14.dp)) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(start = 4.dp),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                Column(Modifier.weight(1f)) {
-                    Text(
-                        text = stringResource(Res.string.actividad_diaria),
-                        style = VelokTheme.tipografia.titleLarge,
-                        color = colores.acentoTexto,
-                        modifier = Modifier.semantics { heading() },
-                    )
-                    Text(
-                        text = actividad.fecha.formatoLargo(),
-                        style = VelokTheme.tipografia.bodySmall,
-                        color = colores.textoSecundario,
-                    )
-                }
-                AnilloProgreso(progreso = actividad.progreso, modifier = Modifier.size(64.dp))
-            }
-            Spacer(Modifier.height(14.dp))
-            // Cuadrícula 2x2: columna izquierda blanca con borde, derecha crema (como en el mockup).
-            metricas.chunked(2).forEachIndexed { fila, par ->
-                if (fila > 0) Spacer(Modifier.height(10.dp))
-                Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                    par.forEachIndexed { columna, metrica ->
-                        MetricaCard(
-                            metrica = metrica,
-                            alterna = columna == 1,
-                            modifier = Modifier.weight(1f),
-                        )
-                    }
-                    if (par.size == 1) Spacer(Modifier.weight(1f))
-                }
-            }
+            Spacer(Modifier.height(32.dp))
+            SeccionPlanes(planes = estado.planes, onVerTodos = onVerTodosPlanes, onAbrirPlan = onAbrirPlan)
         }
     }
 }
@@ -144,6 +91,7 @@ private fun TarjetaActividadDiaria(
 private fun SeccionPlanes(
     planes: List<Plan>,
     onVerTodos: () -> Unit,
+    onAbrirPlan: (String) -> Unit,
 ) {
     val colores = VelokTheme.colores
     Row(
@@ -153,25 +101,25 @@ private fun SeccionPlanes(
         Text(
             text = stringResource(Res.string.planes),
             style = VelokTheme.tipografia.titleMedium,
-            color = colores.textoPrincipal,
+            color = colores.sobreFondo,
             modifier = Modifier.weight(1f).semantics { heading() },
         )
         Text(
             text = stringResource(Res.string.ver_todos),
             style = VelokTheme.tipografia.labelLarge,
-            color = colores.acentoTexto,
+            color = colores.acento,
             modifier = Modifier
                 .clickable(role = Role.Button, onClick = onVerTodos)
                 .padding(vertical = 8.dp, horizontal = 4.dp),
         )
     }
-    Spacer(Modifier.height(8.dp))
+    Spacer(Modifier.height(12.dp))
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         items(planes, key = { it.id }) { plan ->
-            PlanCard(plan = plan, onClick = onVerTodos)
+            PlanCard(plan = plan, onClick = { onAbrirPlan(plan.id) }, modifier = Modifier.width(172.dp))
         }
     }
 }
@@ -192,12 +140,13 @@ private fun DashboardContenidoPreview() {
                         Metrica(TipoMetrica.RITMO_CARDIACO, 90.0, listOf(5f, 7f, 6f, 8f, 6f, 7f)),
                     ),
                     planes = listOf(
-                        Plan("plan-pecho", TipoCategoria.PECHO, "", 8),
-                        Plan("plan-espalda", TipoCategoria.ESPALDA, "", 10),
+                        Plan("plan-lunes", "Set del Lunes", TipoCategoria.PECHO, "", LocalDate(2026, 10, 12), emptyList()),
+                        Plan("plan-martes", "Set del Martes", TipoCategoria.ESPALDA, "", LocalDate(2026, 10, 13), emptyList()),
                     ),
                 ),
                 onReintentar = {},
                 onVerTodosPlanes = {},
+                onAbrirPlan = {},
             )
         }
     }

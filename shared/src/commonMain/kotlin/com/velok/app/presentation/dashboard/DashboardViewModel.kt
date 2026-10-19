@@ -11,19 +11,25 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class DashboardViewModel(
     private val obtenerActividadDiaria: ObtenerActividadDiariaUseCase,
     private val obtenerMetricas: ObtenerMetricasUseCase,
-    private val obtenerPlanes: ObtenerPlanesUseCase,
+    obtenerPlanes: ObtenerPlanesUseCase,
 ) : ViewModel() {
 
     private val _estado = MutableStateFlow(DashboardUiState())
     val estado: StateFlow<DashboardUiState> = _estado.asStateFlow()
 
     init {
+        // Los planes se observan: si se editan o borran, el carrusel se actualiza solo.
+        obtenerPlanes()
+            .onEach { planes -> _estado.update { it.copy(planes = planes) } }
+            .launchIn(viewModelScope)
         cargar()
     }
 
@@ -34,14 +40,8 @@ class DashboardViewModel(
                 coroutineScope {
                     val actividad = async { obtenerActividadDiaria() }
                     val metricas = async { obtenerMetricas() }
-                    val planes = async { obtenerPlanes() }
                     _estado.update {
-                        it.copy(
-                            cargando = false,
-                            actividad = actividad.await(),
-                            metricas = metricas.await(),
-                            planes = planes.await(),
-                        )
+                        it.copy(cargando = false, actividad = actividad.await(), metricas = metricas.await())
                     }
                 }
             } catch (e: CancellationException) {

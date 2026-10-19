@@ -1,10 +1,11 @@
 package com.velok.app.domain.repository
 
 import com.velok.app.domain.model.CategoriaEjercicio
-import com.velok.app.domain.model.Plan
+import com.velok.app.domain.model.Ejercicio
 
-/** Fuente de datos de ejercicios (en el futuro: API de ExerciseDB). */
+/** Catálogo de ejercicios (en el futuro: API de ExerciseDB). */
 interface EjercicioRepository {
-    suspend fun obtenerPlanes(): List<Plan>
     suspend fun obtenerCategorias(): List<CategoriaEjercicio>
+    suspend fun obtenerEjercicios(): List<Ejercicio>
+    suspend fun obtenerEjercicio(id: String): Ejercicio?
 }

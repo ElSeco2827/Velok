@@ -17,8 +17,8 @@ internal val VelokShapes = Shapes(
 /** Formas específicas de Velok que no encajan en la escala de Material. */
 @Immutable
 data class VelokFormas(
-    val encabezado: RoundedCornerShape = RoundedCornerShape(bottomStart = 28.dp, bottomEnd = 28.dp),
     val barraInferior: RoundedCornerShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
+    val hojaInferior: RoundedCornerShape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp),
 )
 
 internal val LocalVelokFormas = staticCompositionLocalOf { VelokFormas() }

@@ -8,6 +8,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 
+// La app es oscura, pero los componentes de Material (diálogos, menús, hojas, campos) se muestran
+// como tarjetas claras, igual que las tarjetas del diseño. Por eso se parte de un esquema claro
+// y solo el fondo general es oscuro.
 private val VelokColorScheme = lightColorScheme(
     primary = VerdeLima,
     onPrimary = Negro,
@@ -15,12 +18,15 @@ private val VelokColorScheme = lightColorScheme(
     onPrimaryContainer = Negro,
     secondary = Negro,
     onSecondary = Blanco,
-    background = Crema,
-    onBackground = Negro,
+    background = Carbon,
+    onBackground = Blanco,
     surface = Blanco,
     onSurface = Negro,
-    surfaceVariant = CremaTarjeta,
+    surfaceVariant = GrisPizarraClaro,
     onSurfaceVariant = GrisTexto,
+    surfaceContainer = Blanco,
+    surfaceContainerLow = Blanco,
+    surfaceContainerHigh = Blanco,
     outline = BordeSutil,
     outlineVariant = BordeSutil,
     error = RojoAlerta,
@@ -29,7 +35,7 @@ private val VelokColorScheme = lightColorScheme(
 @Composable
 fun VelokTheme(content: @Composable () -> Unit) {
     CompositionLocalProvider(
-        LocalVelokColores provides VelokColoresClaros,
+        LocalVelokColores provides VelokColoresOscuros,
         LocalVelokFormas provides VelokFormas(),
     ) {
         MaterialTheme(
