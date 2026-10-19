@@ -50,23 +50,7 @@ shared/
   src/androidMain, src/iosMain      Código específico de plataforma (expect/actual)
 ```
 
-## Cómo ejecutar
+## Requisitos
 
 Requisitos: Android Studio (con el plugin de Kotlin Multiplatform) y JDK 21 (Gradle lo descarga automáticamente si no está instalado). Para iOS
 se necesita una Mac con Xcode.
-
-**Android**
-- Desde Android Studio: elegir la configuración `androidApp` y ejecutar.
-- Desde la terminal:
-  ```bash
-  ./gradlew :androidApp:assembleDebug      # genera el APK
-  ./gradlew :androidApp:installDebug       # lo instala en un dispositivo/emulador conectado
-  ```
-
-**iOS**
-- Abrir `iosApp/iosApp.xcodeproj` en Xcode y ejecutar en un simulador o dispositivo.
-
-**Pruebas**
-```bash
-./gradlew :shared:testAndroidHostTest
-```
