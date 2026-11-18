@@ -4,18 +4,26 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import com.velok.app.data.local.seguridad.HashContrasenas
+import com.velok.app.data.remote.ClienteExerciseDb
+import com.velok.app.data.remote.SincronizadorCatalogo
+import com.velok.app.data.remote.crearClienteHttp
 import com.velok.app.data.repository.LocalCuentaRepository
 import com.velok.app.data.repository.LocalEjercicioRepository
 import com.velok.app.data.repository.LocalPlanRepository
 import com.velok.app.data.repository.LocalSesionRepository
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.mock.MockEngine
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeout
 import kotlin.time.Clock
+import kotlin.time.Duration
 import kotlin.time.Instant
 
 // Utilidades de las pruebas de la base de datos local. Corren en la JVM de la computadora con
@@ -41,13 +49,42 @@ fun baseDatosEnArchivo(nombre: String): BaseDatosVelok =
         .allowMainThreadQueries()
         .build()
 
-/** Los repositorios locales sobre una base de datos, como los arma Koin en la app. */
-class Repositorios(val baseDatos: BaseDatosVelok) {
+/** Reloj que las pruebas pueden adelantar (por ejemplo, 8 días para la vigencia del catálogo). */
+class RelojAjustable(var ahora: Instant = relojFijo.now()) : Clock {
+    override fun now(): Instant = ahora
+}
+
+/** Servidor simulado sin conexión: las pruebas que no son de la descarga nunca usan internet. */
+val servidorSinConexion: MockEngine get() = MockEngine { throw RuntimeException("Sin conexión (prueba)") }
+
+/**
+ * Los repositorios locales sobre una base de datos, como los arma Koin en la app. La descarga del
+ * catálogo usa [motor] (un MockEngine) y no hace pausas entre páginas.
+ */
+class Repositorios(
+    val baseDatos: BaseDatosVelok,
+    motor: HttpClientEngine = servidorSinConexion,
+    val reloj: RelojAjustable = RelojAjustable(),
+) {
+    val alcance = CoroutineScope(SupervisorJob() + Dispatchers.Default)
     val sembrador = SembradorDatos(baseDatos, hashRapido, relojFijo)
-    val ejercicios = LocalEjercicioRepository(baseDatos, sembrador)
+    val sincronizador = SincronizadorCatalogo(
+        cliente = ClienteExerciseDb(crearClienteHttp(motor)),
+        baseDatos = baseDatos,
+        sembrador = sembrador,
+        clock = reloj,
+        pausa = Duration.ZERO,
+    )
+    val ejercicios = LocalEjercicioRepository(baseDatos, sembrador, sincronizador, alcance)
     val planes = LocalPlanRepository(baseDatos, sembrador)
     val sesiones = LocalSesionRepository(baseDatos, sembrador)
     val cuentas = LocalCuentaRepository(baseDatos, sembrador, hashRapido)
+
+    /** Detiene la descarga en segundo plano (si se inició) y cierra la base de datos. */
+    fun cerrar() {
+        alcance.cancel()
+        baseDatos.close()
+    }
 }
 
 /**

@@ -3,18 +3,32 @@ package com.velok.app.data.repository
 import com.velok.app.data.local.BaseDatosVelok
 import com.velok.app.data.local.SembradorDatos
 import com.velok.app.data.local.aDominio
+import com.velok.app.data.remote.SincronizadorCatalogo
 import com.velok.app.domain.model.CategoriaEjercicio
 import com.velok.app.domain.model.Ejercicio
+import com.velok.app.domain.model.EstadoCatalogo
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.repository.EjercicioRepository
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 
 /**
- * Catálogo de ejercicios guardado en la base de datos local (los planes y sesiones lo
- * referencian). Cuando se integre ExerciseDB, este repositorio puede descargarlo y guardarlo aquí.
+ * Catálogo de ejercicios con la estrategia "primero local": las pantallas siempre leen de la base
+ * de datos (funciona sin internet) y la primera vez que se usa el catálogo se inicia en segundo
+ * plano la descarga de ExerciseDB ([SincronizadorCatalogo]). Cuando llegan ejercicios nuevos, Room
+ * vuelve a emitir y las pantallas se actualizan solas.
+ *
+ * @param alcance vive lo mismo que la app: la descarga sigue aunque se cierre la pantalla.
  */
 class LocalEjercicioRepository(
     baseDatos: BaseDatosVelok,
     private val sembrador: SembradorDatos,
+    private val sincronizador: SincronizadorCatalogo,
+    private val alcance: CoroutineScope,
 ) : EjercicioRepository {
 
     private val dao = baseDatos.ejercicioDao()
@@ -25,9 +39,15 @@ class LocalEjercicioRepository(
             CategoriaEjercicio(id = tipo.name.lowercase(), tipo = tipo, imagenUrl = DatosMock.imagen(tipo))
         }
 
-    override suspend fun obtenerEjercicios(): List<Ejercicio> {
+    override fun observarEjercicios(): Flow<List<Ejercicio>> = flow {
         sembrador.asegurarDatos()
-        return dao.todos().map { it.aDominio() }
+        sincronizador.iniciarUnaVez(alcance)
+        emitAll(dao.observarCatalogo().map { lista -> lista.map { it.aDominio() } })
+    }
+
+    override fun observarEstadoCatalogo(): Flow<EstadoCatalogo> = flow {
+        sincronizador.iniciarUnaVez(alcance)
+        emitAll(sincronizador.estado.distinctUntilChanged())
     }
 
     override suspend fun obtenerEjercicio(id: String): Ejercicio? {

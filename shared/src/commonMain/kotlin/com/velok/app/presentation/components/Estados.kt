@@ -1,9 +1,11 @@
 package com.velok.app.presentation.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -18,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.velok.app.presentation.theme.VelokTheme
 import org.jetbrains.compose.resources.stringResource
 import velok.shared.generated.resources.Res
+import velok.shared.generated.resources.catalogo_sin_conexion
 import velok.shared.generated.resources.error_carga
 import velok.shared.generated.resources.reintentar
 import velok.shared.generated.resources.sin_planes
@@ -67,6 +70,32 @@ fun EstadoVacio(mensaje: String, modifier: Modifier = Modifier) {
             color = VelokTheme.colores.sobreFondoSecundario,
             textAlign = TextAlign.Center,
         )
+    }
+}
+
+/**
+ * Aviso discreto de una línea arriba de una lista: no bloquea el contenido. Se usa cuando no se
+ * pudo descargar el catálogo y solo hay ejercicios de ejemplo.
+ */
+@Composable
+fun AvisoDiscreto(mensaje: String, modifier: Modifier = Modifier) {
+    Text(
+        text = mensaje,
+        style = VelokTheme.tipografia.bodySmall,
+        color = VelokTheme.colores.sobreFondoSecundario,
+        textAlign = TextAlign.Center,
+        modifier = modifier
+            .fillMaxWidth()
+            .background(VelokTheme.colores.superficieOscura, VelokTheme.formas.small)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+    )
+}
+
+@Preview
+@Composable
+private fun AvisoDiscretoPreview() {
+    VelokTheme {
+        AvisoDiscreto(stringResource(Res.string.catalogo_sin_conexion), Modifier.padding(16.dp))
     }
 }
 

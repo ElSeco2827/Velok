@@ -34,6 +34,7 @@ import velok.shared.generated.resources.duracion_segundos
 import velok.shared.generated.resources.ejercicio_series
 import velok.shared.generated.resources.equipo_barra
 import velok.shared.generated.resources.equipo_maquina
+import velok.shared.generated.resources.equipo_otro
 import velok.shared.generated.resources.equipo_pesa
 import velok.shared.generated.resources.equipo_tapete
 import velok.shared.generated.resources.fecha_completa
@@ -121,6 +122,7 @@ val TipoEquipo.nombre: StringResource
         TipoEquipo.PESA -> Res.string.equipo_pesa
         TipoEquipo.TAPETE -> Res.string.equipo_tapete
         TipoEquipo.MAQUINA -> Res.string.equipo_maquina
+        TipoEquipo.OTRO -> Res.string.equipo_otro
     }
 
 val TipoEquipo.icono: DrawableResource
@@ -129,6 +131,8 @@ val TipoEquipo.icono: DrawableResource
         TipoEquipo.PESA -> Res.drawable.ic_ejercicio
         TipoEquipo.TAPETE -> Res.drawable.ic_equipo_tapete
         TipoEquipo.MAQUINA -> Res.drawable.ic_equipo_maquina
+        // Sin chip propio (no es filtrable); se reutiliza el ícono general de ejercicio.
+        TipoEquipo.OTRO -> Res.drawable.ic_ejercicio
     }
 
 val Musculo.nombre: StringResource

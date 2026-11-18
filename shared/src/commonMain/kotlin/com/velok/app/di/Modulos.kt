@@ -4,6 +4,9 @@ import com.velok.app.data.local.SembradorDatos
 import com.velok.app.data.local.crearBaseDatos
 import com.velok.app.data.local.moduloPlataforma
 import com.velok.app.data.local.seguridad.HashContrasenas
+import com.velok.app.data.remote.ClienteExerciseDb
+import com.velok.app.data.remote.SincronizadorCatalogo
+import com.velok.app.data.remote.crearClienteHttp
 import com.velok.app.data.repository.LocalCuentaRepository
 import com.velok.app.data.repository.LocalEjercicioRepository
 import com.velok.app.data.repository.LocalPlanRepository
@@ -29,6 +32,7 @@ import com.velok.app.domain.usecase.ObtenerComparacionMuscularUseCase
 import com.velok.app.domain.usecase.ObtenerDestinoInicialUseCase
 import com.velok.app.domain.usecase.ObtenerEjercicioUseCase
 import com.velok.app.domain.usecase.ObtenerEjerciciosUseCase
+import com.velok.app.domain.usecase.ObtenerEstadoCatalogoUseCase
 import com.velok.app.domain.usecase.ObtenerMetricasUseCase
 import com.velok.app.domain.usecase.ObtenerPlanUseCase
 import com.velok.app.domain.usecase.ObtenerPlanesUseCase
@@ -54,10 +58,17 @@ import com.velok.app.presentation.progreso.ProgresoViewModel
 import com.velok.app.presentation.recuperacion.RecuperacionViewModel
 import com.velok.app.presentation.registro.RegistroViewModel
 import com.velok.app.presentation.sesion.SesionViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.qualifier.named
 import org.koin.dsl.module
 import kotlin.time.Clock
+
+/** Alcance que vive lo mismo que la app (descargas en segundo plano). */
+private val ALCANCE_APP = named("alcanceApp")
 
 /**
  * Repositorios de la app: datos guardados en la base de datos local (Room). El constructor de la
@@ -68,9 +79,14 @@ val dataModule = module {
     single { crearBaseDatos(get()) }
     single { HashContrasenas() }
     single { SembradorDatos(get(), get(), get()) }
+    // Capa remota: el motor HTTP lo elige cada plataforma (motorHttp, expect/actual).
+    single(ALCANCE_APP) { CoroutineScope(SupervisorJob() + Dispatchers.Default) }
+    single { crearClienteHttp() }
+    single { ClienteExerciseDb(get()) }
+    single { SincronizadorCatalogo(get(), get(), get(), get()) }
     // Actividad diaria: sigue siendo mock hasta integrar Health Connect / HealthKit.
     single<ActividadRepository> { MockActividadRepository() }
-    single<EjercicioRepository> { LocalEjercicioRepository(get(), get()) }
+    single<EjercicioRepository> { LocalEjercicioRepository(get(), get(), get(), get(ALCANCE_APP)) }
     single<PlanRepository> { LocalPlanRepository(get(), get()) }
     single<SesionRepository> { LocalSesionRepository(get(), get()) }
     // Una sola instancia implementa ambas interfaces porque comparten quién inició sesión.
@@ -85,6 +101,7 @@ val domainModule = module {
     factory { ObtenerMetricasUseCase(get(), get()) }
     factory { ObtenerCategoriasUseCase(get()) }
     factory { ObtenerEjerciciosUseCase(get()) }
+    factory { ObtenerEstadoCatalogoUseCase(get()) }
     factory { ObtenerEjercicioUseCase(get()) }
     factory { ObtenerPlanesUseCase(get()) }
     factory { ObtenerPlanUseCase(get()) }

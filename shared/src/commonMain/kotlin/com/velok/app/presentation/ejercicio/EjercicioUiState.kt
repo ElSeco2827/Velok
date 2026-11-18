@@ -14,4 +14,6 @@ data class EjercicioUiState(
     val equipo: TipoEquipo? = null,
     val ejercicios: List<Ejercicio> = emptyList(),
     val categorias: List<CategoriaEjercicio> = emptyList(),
+    /** No se pudo descargar el catálogo y solo hay ejercicios de ejemplo (aviso discreto). */
+    val sinConexion: Boolean = false,
 )

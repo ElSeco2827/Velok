@@ -20,7 +20,10 @@ import com.velok.app.domain.usecase.ObtenerPlanUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -44,9 +47,12 @@ class EditarPlanViewModel(
             // Se lee una sola vez: a partir de aquí la copia local es la que manda.
             val plan = obtenerPlan(planId).first()
             _estado.update { it.copy(cargando = false, plan = plan) }
-            val catalogo = obtenerEjercicios()
-            _estado.update { it.copy(catalogo = catalogo) }
         }
+        // El catálogo para "Agregar ejercicio" sí se observa: crece mientras se descarga.
+        obtenerEjercicios()
+            .onEach { catalogo -> _estado.update { it.copy(catalogo = catalogo) } }
+            .catch { /* Sin catálogo, el selector queda vacío; el plan se puede seguir editando. */ }
+            .launchIn(viewModelScope)
     }
 
     fun renombrar(nombre: String) = editar { it.renombrar(nombre) }

@@ -8,7 +8,8 @@ vistas, capas (arquitectura), modelo de negocio, multiplataforma y funcionalidad
 - Los mensajes de commit sugeridos son breves, descriptivos y en español.
 - El desarrollo se hace en ramas `feature/*`; `main` no recibe cambios directos.
 - Antes de terminar, compilar con `./gradlew :androidApp:assembleDebug` y correr `./gradlew :shared:testAndroidHostTest`.
-- No incluir claves de API ni datos sensibles. Las claves futuras (ExerciseDB) van en `local.properties` (ignorado por git).
+- No incluir claves de API ni datos sensibles. Si una API futura pide clave, va en `local.properties`
+  (ignorado por git). La API gratuita de ExerciseDB V1 no pide clave.
 - Finales de línea LF (ver `.gitattributes`); se trabaja desde Windows y Mac.
 
 ## Stack
@@ -16,8 +17,13 @@ vistas, capas (arquitectura), modelo de negocio, multiplataforma y funcionalidad
 - Navegación: Navigation Compose multiplataforma con rutas tipadas `@Serializable`.
 - DI: **Koin** (`koin-compose-viewmodel`). Módulos en `di/Modulos.kt`; `initKoin()` se llama desde
   `VelokApplication` (Android) y `MainViewController` (iOS).
-- Imágenes: **Coil 3** (`AsyncImage`). Los modelos exponen `imagenUrl: String`; hoy son URIs de
-  composeResources (`Res.getUri`), mañana URLs remotas, sin tocar la UI.
+- Imágenes: **Coil 3** (`AsyncImage`), configurado en `App()` con `crearCargadorImagenes`
+  (descarga con Ktor y caché en disco). Los modelos exponen `imagenUrl: String`: URIs de
+  composeResources (`Res.getUri`) en los ejercicios de ejemplo y GIF remotos en los de ExerciseDB.
+  **Los GIF se animan solo en Android** (coil-gif); en iOS se muestran como imagen fija porque
+  coil-gif no se publica para iOS (limitación de Coil, ver `agregarDecodificadorGif`).
+- Red: **Ktor client** con motor por plataforma (`motorHttp()`: OkHttp en Android, Darwin en iOS) y
+  `kotlinx-serialization-json`.
 - ViewModels de `lifecycle-viewmodel` multiplataforma con `StateFlow<XxxUiState>`.
 - Fechas: `kotlinx-datetime` + `kotlin.time.Clock`.
 - Versiones en `gradle/libs.versions.toml`; nunca escribir versiones directamente en los `build.gradle.kts`.
@@ -38,6 +44,8 @@ data/
   local/       Base de datos Room (BaseDatosVelok): Entidades.kt, Relaciones.kt, Daos.kt,
                Conversiones.kt (entidad <-> dominio), SembradorDatos (siembra inicial) y
                seguridad/HashContrasenas (PBKDF2 con expect/actual)
+  remote/      API de ExerciseDB: ClienteHttp (motor por plataforma), ClienteExerciseDb, DTOs,
+               MapeoExerciseDb (DTO -> dominio) y SincronizadorCatalogo (descarga a Room)
   repository/  Local* (la app: Plan, Sesion, Ejercicio, Cuenta, sobre Room) y Mock* (en memoria,
                solo para pruebas y vistas previas). Actividad sigue en Mock hasta Health
                Connect/HealthKit. LocalCuentaRepository implementa AuthRepository y
@@ -76,7 +84,8 @@ Reglas:
   `IniciarSesionUseCase`, que inicia una sesión de **entrenamiento**.
 - Código específico de plataforma solo en `androidMain` / `iosMain` vía `expect/actual`.
   `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo. Otros
-  ejemplos: `moduloPlataforma()` (ruta de la base de datos) y el hash de contraseñas.
+  ejemplos: `moduloPlataforma()` (ruta de la base de datos), el hash de contraseñas, `motorHttp()`
+  y `agregarDecodificadorGif()`.
 
 ## Persistencia local
 - **Room KMP** (`room`, `ksp`, `sqlite-bundled` en `libs.versions.toml`) con `BundledSQLiteDriver`;
@@ -95,7 +104,32 @@ Reglas:
 - La sesión iniciada se guarda en la tabla `usuario_actual`; "Cerrar sesión" (Perfil) la borra y
   vuelve a la selección de inicio limpiando la pila de navegación.
 - Pruebas de los repositorios locales en `androidHostTest` con Robolectric y Room en memoria
-  (`Pruebas.kt` arma los repositorios con un hash rápido y una fecha fija).
+  (`Pruebas.kt` arma los repositorios con un hash rápido, una fecha fija y un servidor sin conexión).
+- Migraciones: v1 -> v2 automática (`@AutoMigration`), probada en `MigracionTest` creando una base
+  v1 real a partir de `shared/schemas/.../1.json`.
+
+## Capa remota (ExerciseDB)
+- Todo el acceso a red vive en `data/remote/`; las pantallas, ViewModels y casos de uso nunca
+  usan Ktor ni DTOs.
+- **Primero local**: la app siempre lee de Room. `LocalEjercicioRepository` inicia en segundo plano
+  (`SincronizadorCatalogo.iniciarUnaVez`, una vez por arranque) la descarga, que guarda cada
+  página en Room; los `Flow` de Room actualizan las pantallas. Sin internet se usa lo guardado.
+- API gratuita `https://oss.exercisedb.dev/api/v1/exercises?limit=25&after=<cursor>`, sin clave.
+  Límites estrictos sin cifras publicadas: páginas de 25 con **1 s de pausa**, descarga completa
+  solo si la última tiene más de **7 días**, y cualquier error (sin conexión, 5xx, **429**, JSON
+  inválido) detiene la descarga sin reintentos; sigue desde el cursor guardado en el siguiente
+  arranque (tabla `sincronizacion_catalogo`). Nunca descargar en bucle ni pre-descargar los GIF.
+- Los errores de red nunca lanzan excepciones fuera de `data/remote` (`ResultadoPagina`,
+  `ResultadoSincronizacion`). La UI solo muestra un aviso discreto (`EstadoCatalogo.SIN_CONEXION`)
+  si no hay ningún ejercicio descargado.
+- Mapeo en `MapeoExerciseDb`: nombre en inglés tal cual; categoría, equipo y músculos a nuestros
+  enums (se ven en español). Valores desconocidos: categoría FUERZA, equipo OTRO, músculo de su
+  parte del cuerpo. `TipoEquipo.OTRO` (accesorios) no tiene chip: solo aparece sin filtro.
+- Los 21 ejercicios de ejemplo (`OrigenEjercicio.EJEMPLO`) se quedan en la tabla para los planes e
+  historial; el catálogo los oculta cuando ya hay ejercicios de ExerciseDB. Guardar ejercicios
+  descargados con `@Upsert`, nunca REPLACE (borraría filas que los planes referencian).
+- El detalle de un ejercicio de ExerciseDB muestra "Datos e imágenes: ExerciseDB".
+- Pruebas sin internet: JSON real copiado en `commonTest/.../JsonExerciseDb.kt` y `MockEngine`.
 
 ## Tema visual
 - Acento verde lima `#D3FA6E` (`VelokTheme.colores.acento`). Para texto/íconos sobre fondo claro usar
