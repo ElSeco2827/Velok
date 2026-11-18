@@ -18,10 +18,10 @@ import com.velok.app.presentation.theme.VelokTheme
 
 /**
  * Pantallas principales (después de iniciar sesión): encabezado, barra inferior y su propia
- * navegación entre pestañas.
+ * navegación entre pestañas. [onSesionCerrada] lo maneja la navegación raíz (vuelve al inicio).
  */
 @Composable
-fun PantallaPrincipal() {
+fun PantallaPrincipal(onSesionCerrada: () -> Unit) {
     val navController = rememberNavController()
     val entradaActual by navController.currentBackStackEntryAsState()
     val raizActual = entradaActual?.destination.destinoPrincipal()
@@ -58,6 +58,10 @@ fun PantallaPrincipal() {
             )
         },
     ) { padding ->
-        VelokNavHost(navController = navController, modifier = Modifier.padding(padding))
+        VelokNavHost(
+            navController = navController,
+            onSesionCerrada = onSesionCerrada,
+            modifier = Modifier.padding(padding),
+        )
     }
 }

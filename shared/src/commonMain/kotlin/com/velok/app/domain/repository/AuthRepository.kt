@@ -11,4 +11,7 @@ interface AuthRepository {
     suspend fun ingresarConGoogle(): ResultadoAuth
     suspend fun registrar(nombre: String, correo: String, contrasena: String): ResultadoAuth
     suspend fun restablecerContrasena(correo: String, nuevaContrasena: String): ResultadoAuth
+
+    /** Termina la sesión: a partir de aquí el usuario actual es null. */
+    suspend fun cerrarSesion()
 }

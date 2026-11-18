@@ -1,16 +1,21 @@
 package com.velok.app.di
 
+import com.velok.app.data.local.SembradorDatos
+import com.velok.app.data.local.crearBaseDatos
+import com.velok.app.data.local.moduloPlataforma
+import com.velok.app.data.local.seguridad.HashContrasenas
+import com.velok.app.data.repository.LocalCuentaRepository
+import com.velok.app.data.repository.LocalEjercicioRepository
+import com.velok.app.data.repository.LocalPlanRepository
+import com.velok.app.data.repository.LocalSesionRepository
 import com.velok.app.data.repository.MockActividadRepository
-import com.velok.app.data.repository.MockCuentaRepository
-import com.velok.app.data.repository.MockEjercicioRepository
-import com.velok.app.data.repository.MockPlanRepository
-import com.velok.app.data.repository.MockSesionRepository
 import com.velok.app.domain.repository.ActividadRepository
 import com.velok.app.domain.repository.AuthRepository
 import com.velok.app.domain.repository.EjercicioRepository
 import com.velok.app.domain.repository.PlanRepository
 import com.velok.app.domain.repository.SesionRepository
 import com.velok.app.domain.repository.UsuarioRepository
+import com.velok.app.domain.usecase.CerrarSesionUseCase
 import com.velok.app.domain.usecase.CrearPlanUseCase
 import com.velok.app.domain.usecase.EliminarPlanUseCase
 import com.velok.app.domain.usecase.GuardarPerfilFisicoUseCase
@@ -54,15 +59,24 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import kotlin.time.Clock
 
+/**
+ * Repositorios de la app: datos guardados en la base de datos local (Room). El constructor de la
+ * base de datos lo registra [moduloPlataforma] (expect/actual), porque la ruta del archivo depende
+ * de la plataforma. Los Mock* siguen disponibles para pruebas y vistas previas.
+ */
 val dataModule = module {
+    single { crearBaseDatos(get()) }
+    single { HashContrasenas() }
+    single { SembradorDatos(get(), get(), get()) }
+    // Actividad diaria: sigue siendo mock hasta integrar Health Connect / HealthKit.
     single<ActividadRepository> { MockActividadRepository() }
-    single<EjercicioRepository> { MockEjercicioRepository() }
-    single<PlanRepository> { MockPlanRepository() }
-    single<SesionRepository> { MockSesionRepository() }
+    single<EjercicioRepository> { LocalEjercicioRepository(get(), get()) }
+    single<PlanRepository> { LocalPlanRepository(get(), get()) }
+    single<SesionRepository> { LocalSesionRepository(get(), get()) }
     // Una sola instancia implementa ambas interfaces porque comparten quién inició sesión.
-    single { MockCuentaRepository() }
-    single<AuthRepository> { get<MockCuentaRepository>() }
-    single<UsuarioRepository> { get<MockCuentaRepository>() }
+    single { LocalCuentaRepository(get(), get(), get()) }
+    single<AuthRepository> { get<LocalCuentaRepository>() }
+    single<UsuarioRepository> { get<LocalCuentaRepository>() }
 }
 
 val domainModule = module {
@@ -88,6 +102,7 @@ val domainModule = module {
     factory { IngresarConGoogleUseCase(get()) }
     factory { RegistrarCuentaUseCase(get()) }
     factory { RestablecerContrasenaUseCase(get()) }
+    factory { CerrarSesionUseCase(get()) }
     factory { GuardarPerfilFisicoUseCase(get(), get()) }
 }
 
@@ -111,4 +126,4 @@ val presentationModule = module {
     viewModel { params -> DetalleEjercicioViewModel(params.get(), get(), get()) }
 }
 
-val velokModules = listOf(dataModule, domainModule, presentationModule)
+val velokModules = listOf(moduloPlataforma(), dataModule, domainModule, presentationModule)

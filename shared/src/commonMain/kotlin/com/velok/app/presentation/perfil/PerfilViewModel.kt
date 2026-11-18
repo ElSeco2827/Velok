@@ -3,6 +3,7 @@ package com.velok.app.presentation.perfil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.velok.app.domain.model.RangoTiempo
+import com.velok.app.domain.usecase.CerrarSesionUseCase
 import com.velok.app.domain.usecase.ObtenerComparacionMuscularUseCase
 import com.velok.app.domain.usecase.ObtenerResumenHorasUseCase
 import com.velok.app.domain.usecase.ObtenerUsuarioUseCase
@@ -17,6 +18,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 /** Perfil: saludo, horas por semana y series por grupo muscular. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -24,6 +26,7 @@ class PerfilViewModel(
     obtenerUsuario: ObtenerUsuarioUseCase,
     obtenerResumenHoras: ObtenerResumenHorasUseCase,
     obtenerComparacionMuscular: ObtenerComparacionMuscularUseCase,
+    private val cerrarSesion: CerrarSesionUseCase,
 ) : ViewModel() {
 
     private val _estado = MutableStateFlow(PerfilUiState())
@@ -43,6 +46,14 @@ class PerfilViewModel(
     }
 
     fun cambiarRango(rango: RangoTiempo) = _estado.update { it.copy(rango = rango) }
+
+    /** Cierra la sesión y avisa a la pantalla cuando terminó, para que navegue al inicio. */
+    fun cerrarSesion(alTerminar: () -> Unit) {
+        viewModelScope.launch {
+            cerrarSesion()
+            alTerminar()
+        }
+    }
 
     companion object {
         /** Periodos que ofrece el selector del perfil. */

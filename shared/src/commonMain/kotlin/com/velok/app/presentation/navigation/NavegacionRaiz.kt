@@ -67,7 +67,9 @@ fun NavegacionRaiz(modifier: Modifier = Modifier) {
             )
         }
         composable<RutaFormulario> { FormularioScreen(onTerminado = { irA(DestinoInicial.PRINCIPAL) }) }
-        composable<RutaPrincipal> { PantallaPrincipal() }
+        // Al cerrar sesión se vuelve a la selección de inicio y se borra la pila (irA), así
+        // "atrás" no regresa a las pantallas de la cuenta anterior.
+        composable<RutaPrincipal> { PantallaPrincipal(onSesionCerrada = { irA(DestinoInicial.BIENVENIDA) }) }
     }
 }
 
