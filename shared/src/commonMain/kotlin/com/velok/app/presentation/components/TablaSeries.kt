@@ -102,11 +102,12 @@ fun EncabezadoEjercicio(
             DropdownMenu(
                 expanded = menuAbierto,
                 onDismissRequest = { menuAbierto = false },
-                containerColor = colores.superficie,
+                containerColor = colores.superficieOscura,
+                shape = VelokTheme.formas.small,
             ) {
                 opciones.forEach { opcion ->
                     DropdownMenuItem(
-                        text = { Text(opcion.texto, color = colores.textoPrincipal) },
+                        text = { Text(opcion.texto, color = colores.sobreFondo, style = VelokTheme.tipografia.bodyLarge) },
                         onClick = {
                             menuAbierto = false
                             opcion.onClick()

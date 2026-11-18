@@ -11,9 +11,11 @@ import com.velok.app.domain.model.alternarTipoSerie
 import com.velok.app.domain.model.cambiarDescanso
 import com.velok.app.domain.model.conCategoriaInferida
 import com.velok.app.domain.model.eliminarEjercicio
+import com.velok.app.domain.model.reiniciarEjercicio
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertSame
+import kotlin.test.assertTrue
 
 class EdicionPlanTest {
 
@@ -109,5 +111,20 @@ class EdicionPlanTest {
     fun categoriaInferida_sinEjerciciosNoCambia() {
         val plan = planDePrueba()
         assertSame(plan, plan.conCategoriaInferida())
+    }
+
+    @Test
+    fun reiniciarEjercicio_vuelveALasSeriesSugeridasYConservaDescanso() {
+        val ejercicio = ejercicioDePrueba(series = 3, repeticiones = 10)
+        val editado = planDePrueba(ejercicioPlanDePrueba(ejercicio, Serie(1, TipoSerie.CALENTAMIENTO, 5.0, 8)))
+            .cambiarDescanso(0, 90)
+            .agregarSerie(0)
+
+        val reiniciado = editado.reiniciarEjercicio(0).ejercicios[0]
+
+        assertEquals(listOf(1, 2, 3), reiniciado.series.map { it.id })
+        assertEquals(listOf(10, 10, 10), reiniciado.series.map { it.repeticiones })
+        assertTrue(reiniciado.series.all { it.pesoKg == null && it.tipo == TipoSerie.NORMAL })
+        assertEquals(90, reiniciado.descansoSegundos)
     }
 }

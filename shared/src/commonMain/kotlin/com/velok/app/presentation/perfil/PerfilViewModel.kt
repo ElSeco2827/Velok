@@ -17,7 +17,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 
 /** Perfil: saludo, horas por semana y series por grupo muscular. */
 @OptIn(ExperimentalCoroutinesApi::class)
@@ -31,10 +30,10 @@ class PerfilViewModel(
     val estado: StateFlow<PerfilUiState> = _estado.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            val usuario = obtenerUsuario()
-            _estado.update { it.copy(cargando = false, usuario = usuario) }
-        }
+        // Usuario con sesión iniciada (el que entró por la pantalla de inicio de sesión).
+        obtenerUsuario()
+            .onEach { usuario -> _estado.update { it.copy(cargando = false, usuario = usuario) } }
+            .launchIn(viewModelScope)
         _estado
             .map { it.rango }
             .distinctUntilChanged()

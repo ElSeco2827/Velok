@@ -188,6 +188,11 @@ En `components/Graficas.kt`, sin librerías externas:
 ## 4. Arquitectura: qué hay de nuevo
 
 Se mantiene **Clean Architecture + MVVM** (explicada en el [Avance 01](AVANCE-01.md#3-arquitectura)).
+
+> 📐 **Diagrama visual:** [`diagramas/flujo-capas-sesion.pdf`](diagramas/flujo-capas-sesion.pdf)
+> muestra paso a paso el flujo entre capas con la pantalla «Entrenamiento en curso» (vista general,
+> abrir la pantalla, marcar una serie, terminar el entrenamiento y qué hace cada capa).
+
 Lo nuevo en esta entrega:
 
 ### 4.1 Reglas de negocio como funciones puras
