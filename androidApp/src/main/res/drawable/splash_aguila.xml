@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ícono del splash del sistema (Android 12+): trazos de docs/diseno/logo_velok.svg sin
+     modificar, rellenos y centrados para que quepan en el círculo del splash. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="288dp"
+    android:height="288dp"
+    android:viewportWidth="600"
+    android:viewportHeight="600">
+    <group
+        android:translateX="149.0"
+        android:translateY="230.5">
+        <path
+            android:pathData="M182.356 36.0343L71.8137 138.499C114.266 121.76 137.145 110.702 175.611 86.7493L114.906 138.154H148.256L239.313 65.7043C278.097 63.5416 291.862 66.1253 292.898 81.9193C307.213 62.4159 302.065 54.9572 285.403 43.6243C273.346 21.7195 261.375 16.2403 234.816 13.2643L0.242432 0.499268L35.0913 19.8193L182.356 36.0343Z"
+            android:fillColor="#D3FA6E" />
+        <path
+            android:pathData="M81.5564 61.2193L56.0756 40.8643L150.505 49.4893L132.143 67.4293L81.5564 61.2193Z"
+            android:fillColor="#D3FA6E" />
+        <path
+            android:pathData="M110.41 87.7843L96.5452 76.0543L120.902 77.7793L110.41 87.7843Z"
+            android:fillColor="#D3FA6E" />
+    </group>
+</vector>

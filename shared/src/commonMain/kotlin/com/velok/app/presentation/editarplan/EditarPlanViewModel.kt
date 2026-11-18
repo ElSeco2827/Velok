@@ -11,6 +11,7 @@ import com.velok.app.domain.model.alternarTipoSerie
 import com.velok.app.domain.model.cambiarDescanso
 import com.velok.app.domain.model.cambiarNota
 import com.velok.app.domain.model.eliminarEjercicio
+import com.velok.app.domain.model.reiniciarEjercicio
 import com.velok.app.domain.model.renombrar
 import com.velok.app.domain.usecase.EliminarPlanUseCase
 import com.velok.app.domain.usecase.GuardarPlanUseCase
@@ -51,6 +52,7 @@ class EditarPlanViewModel(
     fun renombrar(nombre: String) = editar { it.renombrar(nombre) }
     fun agregarEjercicio(ejercicio: Ejercicio) = editar { it.agregarEjercicio(ejercicio) }
     fun eliminarEjercicio(indice: Int) = editar { it.eliminarEjercicio(indice) }
+    fun reiniciarEjercicio(indice: Int) = editar { it.reiniciarEjercicio(indice) }
     fun agregarSerie(indice: Int) = editar { it.agregarSerie(indice) }
     fun alternarTipoSerie(indice: Int, idSerie: Int) = editar { it.alternarTipoSerie(indice, idSerie) }
     fun cambiarDescanso(indice: Int, segundos: Int) = editar { it.cambiarDescanso(indice, segundos) }

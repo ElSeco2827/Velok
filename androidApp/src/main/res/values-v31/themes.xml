@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Android 12+: splash del sistema oscuro con el águila, igual a la pantalla de carga. -->
+    <style name="Theme.Velok" parent="android:Theme.Material.NoActionBar">
+        <item name="android:windowBackground">@color/fondo_velok</item>
+        <item name="android:windowSplashScreenBackground">@color/fondo_velok</item>
+        <item name="android:windowSplashScreenAnimatedIcon">@drawable/splash_aguila</item>
+    </style>
+</resources>

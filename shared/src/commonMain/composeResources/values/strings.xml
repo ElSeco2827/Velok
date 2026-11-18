@@ -83,10 +83,11 @@
     <string name="nombre_plan">Nombre del plan</string>
     <string name="agregar_ejercicio">Agregar ejercicio</string>
     <string name="elegir_ejercicio">Elegir ejercicio</string>
-    <string name="eliminar_ejercicio">Eliminar ejercicio</string>
-    <string name="borrar_plan">Borrar plan</string>
-    <string name="borrar_plan_titulo">¿Borrar este plan?</string>
-    <string name="borrar_plan_mensaje">Se eliminará «%1$s». Esta acción no se puede deshacer.</string>
+    <string name="borrar_ejercicio">Borrar ejercicio</string>
+    <string name="reiniciar_ejercicio">Reiniciar ejercicio</string>
+    <string name="borrar_rutina">Borrar rutina</string>
+    <string name="borrar_rutina_titulo">¿Borrar esta rutina?</string>
+    <string name="borrar_rutina_mensaje">Se eliminará «%1$s». Esta acción no se puede deshacer.</string>
     <string name="borrar">Borrar</string>
     <string name="cancelar">Cancelar</string>
     <string name="cambiar_tipo_serie">Serie %1$s. Toca para cambiar entre normal y calentamiento</string>
@@ -185,4 +186,109 @@
     <!-- Estados -->
     <string name="error_carga">No se pudieron cargar los datos</string>
     <string name="reintentar">Reintentar</string>
+    <!-- Inicio y cuenta -->
+    <string name="cargando">Cargando</string>
+    <string name="registrate_google">Regístrate con Google</string>
+    <string name="registrate_correo">Regístrate con correo electrónico</string>
+    <string name="tienes_cuenta">¿Tienes una cuenta?</string>
+    <string name="inicia_sesion_enlace">Inicia sesión</string>
+    <string name="correo_electronico">Correo electrónico</string>
+    <string name="correo_placeholder">ejemplo@gmail.com</string>
+    <string name="contrasena">Contraseña</string>
+    <string name="contrasena_nueva">Contraseña nueva</string>
+    <string name="contrasena_placeholder">Mínimo %1$d caracteres</string>
+    <string name="confirmar_contrasena">Ingresa nuevamente la contraseña</string>
+    <string name="confirmar_placeholder">Igual que la anterior</string>
+    <string name="nombre_usuario">Nombre de usuario</string>
+    <string name="nombre_usuario_placeholder">Usuario1</string>
+    <string name="mostrar_contrasena">Mostrar contraseña</string>
+    <string name="ocultar_contrasena">Ocultar contraseña</string>
+    <string name="olvidaste_contrasena">¿Olvidaste tu contraseña?</string>
+    <string name="iniciar_sesion">Iniciar sesión</string>
+    <string name="iniciar_sesion_google">Iniciar sesión con Google</string>
+    <string name="aceptas_terminos">Al crear una cuenta, aceptas los</string>
+    <string name="terminos_enlace">términos y condiciones</string>
+    <string name="conector_y">y</string>
+    <string name="privacidad_enlace">políticas de privacidad</string>
+    <string name="continuar">Continuar</string>
+
+    <!-- Errores de formularios -->
+    <string name="error_vacio">Este campo es obligatorio</string>
+    <string name="error_correo_invalido">Escribe un correo válido, por ejemplo ejemplo@gmail.com</string>
+    <string name="error_contrasena_corta">La contraseña debe tener al menos %1$d caracteres</string>
+    <string name="error_contrasenas_distintas">Las contraseñas no coinciden</string>
+    <string name="error_nombre_corto">El nombre debe tener al menos %1$d caracteres</string>
+    <string name="error_nombre_largo">El nombre puede tener como máximo %1$d caracteres</string>
+    <string name="error_credenciales">Correo o contraseña incorrectos</string>
+    <string name="error_correo_registrado">Ya existe una cuenta con este correo</string>
+    <string name="error_correo_no_registrado">No hay ninguna cuenta con este correo</string>
+    <string name="error_fecha_futura">La fecha no puede estar en el futuro</string>
+    <string name="error_menor_edad">Debes tener al menos %1$d años para usar Velok</string>
+    <string name="error_estatura">Escribe una estatura entre %1$d y %2$d cm</string>
+    <string name="error_peso">Escribe un peso entre %1$s y %2$s %3$s</string>
+
+    <!-- Cuestionario inicial -->
+    <string name="formulario_saludo">Hola %1$s, para empezar\nhay que conocernos mejor</string>
+    <string name="paso_actual">Paso %1$d de %2$d</string>
+    <string name="pregunta_nacimiento">¿Cuál es tu fecha de nacimiento?</string>
+    <string name="pregunta_unidad">¿Qué medidas usas?</string>
+    <string name="pregunta_estatura">¿Cuál es tu estatura actual?</string>
+    <string name="pregunta_peso">¿Cuál es tu peso actual?</string>
+    <string name="pregunta_meta">¿Cuál es tu meta?</string>
+    <string name="unidad_kg">Kg</string>
+    <string name="unidad_lb">lb</string>
+    <string name="sufijo_cm">cm</string>
+    <string name="sufijo_kg">kg</string>
+    <string name="sufijo_lb">lb</string>
+    <string name="meta_perder_grasa">Perder grasa</string>
+    <string name="meta_ganar_musculo">Ganar músculo</string>
+    <string name="meta_mantener">Mantener</string>
+    <string name="siguiente">Siguiente</string>
+    <string name="ejemplo_estatura">170</string>
+    <string name="ejemplo_peso_kg">70</string>
+    <string name="ejemplo_peso_lb">155</string>
+
+    <!-- Documentos legales: "## " = sección, "### " = subtítulo, "• " = viñeta -->
+    <string-array name="documento_terminos">
+        <item>Términos y condiciones de uso</item>
+        <item>Velok · Última actualización: [FECHA]</item>
+        <item>## 1. Aceptación de los términos</item>
+        <item>Al crear una cuenta o usar Velok (la “App”), aceptas estos Términos y condiciones y nuestra Política de privacidad. Si no estás de acuerdo con ellos, no debes usar la App.</item>
+        <item>La App es operada por [NOMBRE O RAZÓN SOCIAL DEL RESPONSABLE], con domicilio en [DOMICILIO COMPLETO] (“nosotros”).</item>
+        <item>## 2. Qué es la App</item>
+        <item>Velok es una aplicación para registrar y dar seguimiento a tus rutinas de gimnasio. Te permite consultar los ejercicios de tu rutina, medir la duración de tus sesiones, registrar el peso que levantas y ver tu progreso.</item>
+        <item>Podemos agregar, modificar o retirar funciones en cualquier momento.</item>
+        <item>## 3. Requisitos para usar la App</item>
+        <item>• Debes tener al menos [18] años.</item>
+        <item>• Debes proporcionar información veraz y mantenerla actualizada.</item>
+        <item>• Solo puedes tener una cuenta personal. No está permitido crear cuentas a nombre de otra persona.</item>
+        <item>## 4. Tu cuenta y su seguridad</item>
+        <item>Eres responsable de mantener la confidencialidad de tu contraseña y de toda la actividad que ocurra en tu cuenta. Si sospechas que alguien accedió sin tu autorización, avísanos de inmediato en [CORREO DE CONTACTO].</item>
+        <item>Si inicias sesión con Google, también estás sujeto a los términos de Google respecto de esa cuenta.</item>
+        <item>## 5. Aviso importante sobre salud y ejercicio</item>
+        <item>La App ofrece información y herramientas de seguimiento con fines informativos y de organización. No es un servicio médico, ni sustituye el consejo de un médico, entrenador o nutriólogo.</item>
+    </string-array>
+    <string-array name="documento_privacidad">
+        <item>Política de privacidad (Aviso de privacidad)</item>
+        <item>Velok · Última actualización: [FECHA]</item>
+        <item>## 1. Quién es el responsable de tus datos</item>
+        <item>[NOMBRE O RAZÓN SOCIAL DEL RESPONSABLE], con domicilio en [DOMICILIO COMPLETO], es el responsable del tratamiento de tus datos personales conforme a la legislación mexicana aplicable en materia de protección de datos personales.</item>
+        <item>Puedes contactarnos en: [CORREO DE CONTACTO PARA PRIVACIDAD].</item>
+        <item>## 2. Qué datos personales recabamos</item>
+        <item>Recabamos los siguientes datos, según cómo uses la app:</item>
+        <item>### Datos de cuenta</item>
+        <item>• Nombre</item>
+        <item>• Correo electrónico</item>
+        <item>• Contraseña (se almacena cifrada; nunca la vemos en texto legible)</item>
+        <item>• Si usas Google para iniciar sesión: nombre, correo y foto de perfil que Google nos comparte con tu autorización</item>
+        <item>• Confirmación de que eres mayor de edad [o fecha de nacimiento]</item>
+        <item>### Datos de perfil y entrenamiento</item>
+        <item>• Unidades de medida preferidas</item>
+        <item>• Objetivo de entrenamiento, nivel de experiencia, días y duración disponibles, y equipo o lugar de entrenamiento</item>
+        <item>• Peso corporal [y estatura, sexo, peso deseado], solo si decides proporcionarlos</item>
+        <item>### Datos de uso de la app</item>
+        <item>• Rutinas, ejercicios realizados, series, repeticiones y peso levantado</item>
+        <item>• Duración de tus sesiones y calorías estimadas</item>
+        <item>• Historial y progreso</item>
+    </string-array>
 </resources>

@@ -73,7 +73,7 @@ import velok.shared.generated.resources.anterior
 import velok.shared.generated.resources.descanso
 import velok.shared.generated.resources.desmarcar_serie
 import velok.shared.generated.resources.duracion
-import velok.shared.generated.resources.eliminar_ejercicio
+import velok.shared.generated.resources.borrar_ejercicio
 import velok.shared.generated.resources.ic_cronometro
 import velok.shared.generated.resources.ic_nota
 import velok.shared.generated.resources.kg
@@ -242,7 +242,7 @@ private fun EjercicioEnSesion(
             imagenUrl = ej.ejercicio.imagenUrl,
             onNombreClick = { acciones.onAbrirEjercicio(ej.ejercicio.id) },
             opciones = listOf(
-                OpcionMenu(stringResource(Res.string.eliminar_ejercicio)) { acciones.onEliminarEjercicio(indice) },
+                OpcionMenu(stringResource(Res.string.borrar_ejercicio)) { acciones.onEliminarEjercicio(indice) },
             ),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

@@ -70,14 +70,14 @@ import kotlin.time.Duration.Companion.seconds
 import velok.shared.generated.resources.Res
 import velok.shared.generated.resources.agregar_ejercicio
 import velok.shared.generated.resources.borrar
-import velok.shared.generated.resources.borrar_plan
-import velok.shared.generated.resources.borrar_plan_mensaje
-import velok.shared.generated.resources.borrar_plan_titulo
+import velok.shared.generated.resources.borrar_ejercicio
+import velok.shared.generated.resources.borrar_rutina
+import velok.shared.generated.resources.borrar_rutina_mensaje
+import velok.shared.generated.resources.borrar_rutina_titulo
 import velok.shared.generated.resources.cambiar_tipo_serie
 import velok.shared.generated.resources.cancelar
 import velok.shared.generated.resources.descanso
 import velok.shared.generated.resources.elegir_ejercicio
-import velok.shared.generated.resources.eliminar_ejercicio
 import velok.shared.generated.resources.ic_cronometro
 import velok.shared.generated.resources.ic_nota
 import velok.shared.generated.resources.kg
@@ -85,6 +85,7 @@ import velok.shared.generated.resources.nombre_plan
 import velok.shared.generated.resources.nota
 import velok.shared.generated.resources.plan_no_encontrado
 import velok.shared.generated.resources.plan_sin_nombre
+import velok.shared.generated.resources.reiniciar_ejercicio
 import velok.shared.generated.resources.reps
 import velok.shared.generated.resources.serie
 import velok.shared.generated.resources.serie_calentamiento
@@ -107,6 +108,7 @@ fun EditarPlanScreen(
             onRenombrar = viewModel::renombrar,
             onAgregarEjercicio = viewModel::agregarEjercicio,
             onEliminarEjercicio = viewModel::eliminarEjercicio,
+            onReiniciarEjercicio = viewModel::reiniciarEjercicio,
             onAgregarSerie = viewModel::agregarSerie,
             onAlternarTipoSerie = viewModel::alternarTipoSerie,
             onCambiarPeso = viewModel::cambiarPeso,
@@ -124,6 +126,7 @@ class AccionesEditarPlan(
     val onRenombrar: (String) -> Unit = {},
     val onAgregarEjercicio: (Ejercicio) -> Unit = {},
     val onEliminarEjercicio: (Int) -> Unit = {},
+    val onReiniciarEjercicio: (Int) -> Unit = {},
     val onAgregarSerie: (Int) -> Unit = {},
     val onAlternarTipoSerie: (Int, Int) -> Unit = { _, _ -> },
     val onCambiarPeso: (Int, Int, Double?) -> Unit = { _, _, _ -> },
@@ -156,7 +159,7 @@ fun EditarPlanContenido(
             ) {
                 item(key = "nombre") { CampoNombrePlan(plan.nombre, acciones.onRenombrar) }
                 itemsIndexed(plan.ejercicios, key = { i, ep -> "$i-${ep.ejercicio.id}" }) { indice, ep ->
-                    EjercicioEditable(indice, ep, acciones)
+                    EjercicioEditable(indice, ep, acciones, onBorrarRutina = { confirmarBorrado = true })
                 }
                 item(key = "agregar") {
                     BotonOscuroAncho(
@@ -164,9 +167,13 @@ fun EditarPlanContenido(
                         onClick = { elegirEjercicio = true },
                     )
                 }
-                item(key = "borrar") {
-                    TextButton(onClick = { confirmarBorrado = true }, modifier = Modifier.fillMaxWidth()) {
-                        Text(stringResource(Res.string.borrar_plan), color = colores.alerta)
+                // El diseño borra la rutina desde el menú ⋮ de un ejercicio; si no hay ejercicios
+                // no hay menú, así que se ofrece este botón.
+                if (plan.ejercicios.isEmpty()) {
+                    item(key = "borrar") {
+                        TextButton(onClick = { confirmarBorrado = true }, modifier = Modifier.fillMaxWidth()) {
+                            Text(stringResource(Res.string.borrar_rutina), color = colores.alerta)
+                        }
                     }
                 }
             }
@@ -208,8 +215,8 @@ fun EditarPlanContenido(
         val nombre = plan.nombre.ifBlank { stringResource(Res.string.plan_sin_nombre) }
         AlertDialog(
             onDismissRequest = { confirmarBorrado = false },
-            title = { Text(stringResource(Res.string.borrar_plan_titulo)) },
-            text = { Text(stringResource(Res.string.borrar_plan_mensaje, nombre)) },
+            title = { Text(stringResource(Res.string.borrar_rutina_titulo)) },
+            text = { Text(stringResource(Res.string.borrar_rutina_mensaje, nombre)) },
             confirmButton = {
                 TextButton(onClick = {
                     confirmarBorrado = false
@@ -252,7 +259,12 @@ private fun CampoNombrePlan(nombre: String, onCambio: (String) -> Unit) {
 }
 
 @Composable
-private fun EjercicioEditable(indice: Int, ep: EjercicioPlan, acciones: AccionesEditarPlan) {
+private fun EjercicioEditable(
+    indice: Int,
+    ep: EjercicioPlan,
+    acciones: AccionesEditarPlan,
+    onBorrarRutina: () -> Unit,
+) {
     var mostrarNota by remember(ep.ejercicio.id) { mutableStateOf(ep.nota.isNotEmpty()) }
     var menuDescanso by remember { mutableStateOf(false) }
 
@@ -261,8 +273,11 @@ private fun EjercicioEditable(indice: Int, ep: EjercicioPlan, acciones: Acciones
             nombre = ep.ejercicio.nombre,
             imagenUrl = ep.ejercicio.imagenUrl,
             onNombreClick = { acciones.onAbrirEjercicio(ep.ejercicio.id) },
+            // Opciones del diseño "Borrar plan".
             opciones = listOf(
-                OpcionMenu(stringResource(Res.string.eliminar_ejercicio)) { acciones.onEliminarEjercicio(indice) },
+                OpcionMenu(stringResource(Res.string.borrar_ejercicio)) { acciones.onEliminarEjercicio(indice) },
+                OpcionMenu(stringResource(Res.string.borrar_rutina), onClick = onBorrarRutina),
+                OpcionMenu(stringResource(Res.string.reiniciar_ejercicio)) { acciones.onReiniciarEjercicio(indice) },
             ),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {

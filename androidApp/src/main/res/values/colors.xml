@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mismo fondo que VelokTheme.colores.fondo: evita un destello blanco al abrir la app. -->
+    <color name="fondo_velok">#171819</color>
+</resources>

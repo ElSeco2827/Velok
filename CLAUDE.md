@@ -31,15 +31,19 @@ domain/        Kotlin puro: sin Compose, sin recursos, sin textos visibles
   model/       Entidades (Plan, Ejercicio, SesionEntrenamiento, Metrica...) y sus reglas como
                funciones puras que devuelven copias (EdicionPlan.kt, SesionEntrenamiento.kt)
   calculo/     Estadísticas puras a partir del historial (progreso, horas por semana, músculos)
-  repository/  Interfaces (Actividad, Ejercicio, Plan, Sesion, Usuario)
+  validacion/  Reglas de formularios (ReglasCuenta, ReglasPerfil) que devuelven un ErrorCampo o null
+  repository/  Interfaces (Actividad, Auth, Ejercicio, Plan, Sesion, Usuario)
   usecase/     Un caso de uso por clase con `operator fun invoke()` (`suspend` o que devuelve `Flow`)
 data/
   repository/  Implementaciones (hoy Mock*, con datos en DatosMock.kt; luego Health Connect/HealthKit
-               y ExerciseDB). Planes e historial viven en memoria con MutableStateFlow.
+               y ExerciseDB). Planes, historial y cuentas viven en memoria con MutableStateFlow.
+               MockCuentaRepository implementa AuthRepository y UsuarioRepository a la vez.
+               Cuenta de prueba: checo@velok.app / velok2026 (cuestionario ya completo).
 di/            Módulos de Koin (dataModule, domainModule, presentationModule)
 presentation/
   theme/       VelokTheme: colores, tipografía, formas
-  navigation/  Rutas, DestinoPrincipal, VelokNavHost
+  navigation/  NavegacionRaiz (carga → cuenta → cuestionario → PantallaPrincipal) y, dentro de
+               PantallaPrincipal, VelokNavHost con las pestañas (Rutas, DestinoPrincipal)
   components/  Componentes reutilizables con @Preview
   util/        Formato de números y mapeo dominio -> recursos (RecursosUi.kt)
   <pantalla>/  XxxScreen, XxxViewModel, XxxUiState
@@ -56,6 +60,15 @@ Reglas:
 - Pantallas de detalle: rutas tipadas con id (`RutaDetallePlan(planId)`) y ViewModel creado con
   `koinViewModel(key = ...) { parametersOf(id) }`.
 - Pantallas con muchos eventos los agrupan en una clase `AccionesXxx` en lugar de muchos parámetros.
+- Formularios: el caso de uso valida con `validacion/` y devuelve `ResultadoFormulario` (Exito,
+  Invalido con los errores por campo, o Rechazado por el repositorio). La pantalla traduce cada
+  `ErrorCampo`/`ErrorCuenta` a texto con `presentation/util/MensajesError.kt`.
+- Al iniciar sesión, `destinoPara(usuario)` decide si ir al cuestionario o a la app; la navegación
+  borra la pila (`popUpTo(graph.id)`) para que "atrás" no regrese a las pantallas de cuenta.
+- "Atrás" dentro de una pantalla (pasos del cuestionario): `NavigationBackHandler` de
+  navigationevent-compose (no el `BackHandler` de compose-ui, que está obsoleto).
+- Los casos de uso de cuenta se llaman `Ingresar...`/`Registrar...` para no confundirlos con
+  `IniciarSesionUseCase`, que inicia una sesión de **entrenamiento**.
 - Código específico de plataforma solo en `androidMain` / `iosMain` vía `expect/actual`.
   `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo.
 
@@ -67,6 +80,9 @@ Reglas:
 - Encabezado plano con el logo `logo_velok_encabezado.png` (copia sin cambios de
   `docs/diseno/Header.png`), campana con punto rojo y flecha de "atrás" en pantallas de detalle
   (iOS no tiene botón de atrás del sistema).
+- Logos: `logo_velok_aguila.xml` (trazos de `docs/diseno/logo_velok.svg` rellenos, para tamaños
+  grandes), `logo_velok_texto.png` (recorte exacto de Header.png) y `LogoHorizontal` (Header.png).
+  En Android, el splash del sistema usa la misma águila (`androidApp/.../splash_aguila.xml`).
 - Azul `informativo` solo en sesión y editor (nombres de ejercicio en tablas y duración); el resto
   de gráficas y selectores, incluido el perfil, usan el verde lima `acento`. Ámbar `calentamiento`
   para las series "W".
@@ -91,5 +107,5 @@ Reglas:
 - Componentes reutilizables: `XxxCard`, `VelokXxx` para piezas de marca (`VelokHeader`, `VelokBottomBar`).
 - Rutas `RutaXxx` (`data object` serializable).
 - Recursos: `nav_*`, `metrica_*`, `valor_*`, `categoria_*`, `tab_*`, `equipo_*`, `musculo_*`,
-  `grupo_*`, `rango_*` para strings; `ic_*` para íconos; `categoria_<tipo>.jpg` para las imágenes
+  `grupo_*`, `rango_*`, `error_*`, `pregunta_*`, `meta_*` para strings; `ic_*` para íconos; `categoria_<tipo>.jpg` para las imágenes
   de categoría.

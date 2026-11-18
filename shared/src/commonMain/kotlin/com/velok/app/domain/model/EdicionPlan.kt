@@ -26,6 +26,17 @@ fun Plan.agregarEjercicio(ejercicio: Ejercicio): Plan {
     return copy(ejercicios = ejercicios + EjercicioPlan(ejercicio, series))
 }
 
+/**
+ * Vuelve las series del ejercicio a las sugeridas por el catálogo (sin peso), como si se acabara
+ * de agregar. Conserva el descanso y la nota.
+ */
+fun Plan.reiniciarEjercicio(indice: Int): Plan = actualizarEjercicio(indice) { ep ->
+    val sugeridas = (1..ep.ejercicio.seriesSugeridas).map { id ->
+        Serie(id = id, repeticiones = ep.ejercicio.repeticionesSugeridas)
+    }
+    ep.copy(series = sugeridas)
+}
+
 fun Plan.eliminarEjercicio(indice: Int): Plan =
     copy(ejercicios = ejercicios.filterIndexed { i, _ -> i != indice })
 

@@ -222,7 +222,7 @@ private fun PerfilContenidoPreview() {
             PerfilContenido(
                 estado = PerfilUiState(
                     cargando = false,
-                    usuario = Usuario("Checo"),
+                    usuario = Usuario(id = "u", nombre = "Checo", correo = "checo@velok.app"),
                     horas = ResumenHoras(
                         horasEstaSemana = 3.0,
                         semanas = listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 1.1, 1.5, 0.0, 1.8, 2.2, 2.7)
