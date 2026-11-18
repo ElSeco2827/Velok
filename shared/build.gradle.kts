@@ -52,6 +52,13 @@ kotlin {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
             implementation(libs.koin.android)
+            // Motor HTTP de Android y GIF animados (coil-gif solo existe para Android).
+            implementation(libs.ktor.client.okhttp)
+            implementation(libs.coil.gif)
+        }
+        iosMain.dependencies {
+            // Motor HTTP de iOS (NSURLSession).
+            implementation(libs.ktor.client.darwin)
         }
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -72,10 +79,14 @@ kotlin {
             implementation(libs.kotlinx.serialization.core)
             implementation(libs.room.runtime)
             implementation(libs.sqlite.bundled)
+            implementation(libs.kotlinx.serialization.json)
+            implementation(libs.ktor.client.core)
+            implementation(libs.coil.network.ktor3)
         }
         commonTest.dependencies {
             implementation(libs.kotlin.test)
             implementation(libs.kotlinx.coroutines.test)
+            implementation(libs.ktor.client.mock)
         }
         // Pruebas de los repositorios locales: Room necesita un Context de Android, que en la JVM
         // de la computadora lo da Robolectric.
