@@ -37,8 +37,8 @@ class PersistenciaTest {
 
         val segundaVez = Repositorios(baseDatosEnArchivo("siembra.db"))
         assertEquals(emptyList(), segundaVez.planes.observarPlanes().first())
-        assertEquals(DatosMock.ejercicios, segundaVez.ejercicios.obtenerEjercicios())
+        assertEquals(DatosMock.ejercicios, segundaVez.ejercicios.observarEjercicios().first())
         assertEquals(DatosMock.historial(relojFijo).size, segundaVez.sesiones.observarHistorial().first().size)
-        segundaVez.baseDatos.close()
+        segundaVez.cerrar()
     }
 }

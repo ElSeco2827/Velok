@@ -26,6 +26,7 @@ import coil3.compose.AsyncImage
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.MetricaProgreso
 import com.velok.app.domain.model.Musculo
+import com.velok.app.domain.model.OrigenEjercicio
 import com.velok.app.domain.model.RangoTiempo
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
@@ -38,6 +39,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import org.koin.core.parameter.parametersOf
 import velok.shared.generated.resources.Res
+import velok.shared.generated.resources.atribucion_exercisedb
 import velok.shared.generated.resources.ejercicio_no_encontrado
 import velok.shared.generated.resources.primario
 import velok.shared.generated.resources.resumen_info_ejercicio
@@ -67,10 +69,13 @@ fun DetalleEjercicioContenido(
             estado.cargando -> EstadoCargando()
             ejercicio == null -> EstadoVacio(stringResource(Res.string.ejercicio_no_encontrado))
             else -> Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                val deExerciseDb = ejercicio.origen == OrigenEjercicio.EXERCISEDB
+                // El GIF de ExerciseDB es cuadrado y muestra el movimiento completo: se ajusta sin
+                // recortar. Se anima en Android; en iOS se ve fijo (Coil no anima GIF en iOS).
                 AsyncImage(
                     model = ejercicio.imagenUrl,
                     contentDescription = null,
-                    contentScale = ContentScale.Crop,
+                    contentScale = if (deExerciseDb) ContentScale.Fit else ContentScale.Crop,
                     placeholder = ColorPainter(colores.superficie),
                     error = ColorPainter(colores.superficie),
                     modifier = Modifier.fillMaxWidth().height(220.dp).background(colores.superficie),
@@ -94,6 +99,14 @@ fun DetalleEjercicioContenido(
                         Text(
                             text = stringResource(Res.string.secundario, secundarios),
                             style = VelokTheme.tipografia.bodyMedium,
+                            color = colores.sobreFondoSecundario,
+                        )
+                    }
+                    if (deExerciseDb) {
+                        Spacer(Modifier.height(8.dp))
+                        Text(
+                            text = stringResource(Res.string.atribucion_exercisedb),
+                            style = VelokTheme.tipografia.labelSmall,
                             color = colores.sobreFondoSecundario,
                         )
                     }
@@ -121,8 +134,9 @@ private fun DetalleEjercicioContenidoPreview() {
                 estado = DetalleEjercicioUiState(
                     cargando = false,
                     ejercicio = Ejercicio(
-                        "s", "Sentadilla (Barra)", TipoCategoria.PIERNA, TipoEquipo.BARRA,
+                        "s", "Barbell full squat", TipoCategoria.PIERNA, TipoEquipo.BARRA,
                         Musculo.CUADRICEPS, listOf(Musculo.ISQUIOTIBIALES, Musculo.GLUTEOS), "",
+                        origen = OrigenEjercicio.EXERCISEDB,
                     ),
                     progreso = listOf(5.0, 7.5, 7.5, 10.0, 10.0, 12.5),
                 ),

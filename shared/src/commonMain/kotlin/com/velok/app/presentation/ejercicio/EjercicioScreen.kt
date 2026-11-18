@@ -34,6 +34,7 @@ import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.Musculo
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
+import com.velok.app.presentation.components.AvisoDiscreto
 import com.velok.app.presentation.components.CategoriaCard
 import com.velok.app.presentation.components.ChipEquipo
 import com.velok.app.presentation.components.EjercicioFila
@@ -46,6 +47,7 @@ import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import velok.shared.generated.resources.Res
+import velok.shared.generated.resources.catalogo_sin_conexion
 import velok.shared.generated.resources.sin_ejercicios
 import velok.shared.generated.resources.tab_ejercicio
 import velok.shared.generated.resources.tab_entrenamiento
@@ -82,6 +84,12 @@ fun EjercicioContenido(
         when (estado.pestana) {
             PestanaEjercicio.EJERCICIO -> {
                 FiltrosEquipo(seleccionado = estado.equipo, onAlternar = onAlternarEquipo)
+                if (estado.sinConexion) {
+                    AvisoDiscreto(
+                        mensaje = stringResource(Res.string.catalogo_sin_conexion),
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                    )
+                }
                 when {
                     estado.cargando -> EstadoCargando()
                     estado.error -> EstadoError(onReintentar)
@@ -150,7 +158,8 @@ private fun FiltrosEquipo(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 4.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-        TipoEquipo.entries.forEach { equipo ->
+        // Solo los 4 chips del diseño: OTRO no se puede filtrar (aparece sin filtro).
+        TipoEquipo.filtrables.forEach { equipo ->
             ChipEquipo(
                 equipo = equipo,
                 seleccionado = equipo == seleccionado,

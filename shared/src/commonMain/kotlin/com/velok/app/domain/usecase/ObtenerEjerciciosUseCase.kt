@@ -4,13 +4,18 @@ import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.repository.EjercicioRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
-/** Catálogo filtrado por equipo y/o categoría; null en un filtro significa "todos". */
+/**
+ * Catálogo filtrado por equipo y/o categoría; null en un filtro significa "todos". Los ejercicios
+ * con equipo OTRO solo aparecen sin filtro de equipo (no tienen chip propio).
+ */
 class ObtenerEjerciciosUseCase(private val repository: EjercicioRepository) {
-    suspend operator fun invoke(
+    operator fun invoke(
         equipo: TipoEquipo? = null,
         categoria: TipoCategoria? = null,
-    ): List<Ejercicio> = repository.obtenerEjercicios().filter {
-        (equipo == null || it.equipo == equipo) && (categoria == null || it.categoria == categoria)
+    ): Flow<List<Ejercicio>> = repository.observarEjercicios().map { lista ->
+        lista.filter { (equipo == null || it.equipo == equipo) && (categoria == null || it.categoria == categoria) }
     }
 }
