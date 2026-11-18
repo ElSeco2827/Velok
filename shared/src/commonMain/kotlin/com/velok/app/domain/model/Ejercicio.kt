@@ -6,6 +6,27 @@ enum class TipoEquipo {
     PESA,
     TAPETE,
     MAQUINA,
+
+    /**
+     * Accesorios y lo que no encaja en los otros (bandas, cuerdas, balones, rodillos...). No tiene
+     * filtro propio: estos ejercicios solo aparecen cuando no hay filtro de equipo ([filtrables]).
+     */
+    OTRO,
+    ;
+
+    companion object {
+        /** Equipos que se pueden elegir como filtro (los 4 chips del diseño). */
+        val filtrables = listOf(BARRA, PESA, TAPETE, MAQUINA)
+    }
+}
+
+/** De dónde viene un ejercicio del catálogo. */
+enum class OrigenEjercicio {
+    /** Los 21 de ejemplo (en español). Siguen disponibles para los planes e historial que los usan. */
+    EJEMPLO,
+
+    /** Descargado de la API de ExerciseDB (nombre en inglés, imagen GIF). */
+    EXERCISEDB,
 }
 
 /** Grupos que se comparan en la gráfica de radar del perfil. */
@@ -37,7 +58,9 @@ enum class Musculo(val grupo: GrupoMuscular) {
 /**
  * Ejercicio del catálogo.
  *
- * @property nombre viene de la fuente de datos (hoy mock; después ExerciseDB), no de los recursos de UI.
+ * @property nombre viene de la fuente de datos, no de los recursos de UI: en español en los de
+ * ejemplo y en inglés en los de ExerciseDB (no se traduce).
+ * @property imagenUrl en los de ExerciseDB es un GIF remoto (animado en Android, fijo en iOS).
  * @property seriesSugeridas y [repeticionesSugeridas] se usan al agregarlo a un plan ("12 × 4 series").
  */
 data class Ejercicio(
@@ -50,4 +73,5 @@ data class Ejercicio(
     val imagenUrl: String,
     val seriesSugeridas: Int = 4,
     val repeticionesSugeridas: Int = 12,
+    val origen: OrigenEjercicio = OrigenEjercicio.EJEMPLO,
 )

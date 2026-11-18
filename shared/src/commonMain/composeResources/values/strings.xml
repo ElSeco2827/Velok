@@ -130,8 +130,11 @@
     <string name="equipo_pesa">Pesa</string>
     <string name="equipo_tapete">Tapete</string>
     <string name="equipo_maquina">Máquina</string>
+    <string name="equipo_otro">Otro</string>
     <string name="ejercicio_series">%1$d × %2$d series</string>
     <string name="sin_ejercicios">No hay ejercicios con este filtro</string>
+    <string name="catalogo_sin_conexion">Sin conexión: se muestran ejercicios de ejemplo</string>
+    <string name="atribucion_exercisedb">Datos e imágenes: ExerciseDB</string>
     <string name="ejercicio_no_encontrado">No se encontró el ejercicio</string>
     <string name="primario">Primario: %1$s</string>
     <string name="secundario">Secundario: %1$s</string>

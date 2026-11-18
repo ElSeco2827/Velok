@@ -6,6 +6,7 @@ import com.velok.app.domain.model.EjercicioPlan
 import com.velok.app.domain.model.EjercicioSesion
 import com.velok.app.domain.model.MetaEntrenamiento
 import com.velok.app.domain.model.Musculo
+import com.velok.app.domain.model.OrigenEjercicio
 import com.velok.app.domain.model.PerfilFisico
 import com.velok.app.domain.model.Plan
 import com.velok.app.domain.model.Serie
@@ -22,11 +23,12 @@ import kotlin.time.Instant
 // Conversión entre las tablas (Entidades.kt) y los modelos del dominio.
 
 /**
- * La imagen no se guarda: hoy son recursos locales cuya ruta en iOS cambia al reinstalar la app,
- * así que se calcula a partir de la categoría. Cuando lleguen URLs de ExerciseDB se agregará una
- * columna.
+ * Las imágenes locales no se guardan: son recursos cuya ruta en iOS cambia al reinstalar la app,
+ * así que se calculan a partir de la categoría. Solo se guardan URLs remotas (ExerciseDB).
  */
 private fun imagen(categoria: TipoCategoria): String = DatosMock.imagen(categoria)
+
+private fun String.esUrlRemota() = startsWith("https://") || startsWith("http://")
 
 private fun idHijo(padreId: String, posicion: Int) = "$padreId:$posicion"
 
@@ -42,6 +44,8 @@ fun Ejercicio.aEntidad(orden: Int) = EjercicioEntidad(
     musculosSecundarios = musculosSecundarios.joinToString(",") { it.name },
     seriesSugeridas = seriesSugeridas,
     repeticionesSugeridas = repeticionesSugeridas,
+    imagenUrl = imagenUrl.takeIf { it.esUrlRemota() },
+    origen = origen.name,
 )
 
 fun EjercicioEntidad.aDominio(): Ejercicio {
@@ -53,9 +57,10 @@ fun EjercicioEntidad.aDominio(): Ejercicio {
         equipo = TipoEquipo.valueOf(equipo),
         musculoPrimario = Musculo.valueOf(musculoPrimario),
         musculosSecundarios = musculosSecundarios.split(",").filter { it.isNotEmpty() }.map(Musculo::valueOf),
-        imagenUrl = imagen(tipo),
+        imagenUrl = imagenUrl ?: imagen(tipo),
         seriesSugeridas = seriesSugeridas,
         repeticionesSugeridas = repeticionesSugeridas,
+        origen = OrigenEjercicio.valueOf(origen),
     )
 }
 

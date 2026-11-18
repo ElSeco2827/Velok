@@ -1,5 +1,6 @@
 package com.velok.app.data.local
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -10,8 +11,11 @@ import androidx.room.PrimaryKey
 // Los enums se guardan por su nombre (TipoCategoria.PECHO -> "PECHO") y las fechas como texto ISO
 // (LocalDate) o milisegundos desde 1970 (Instant).
 
-/** Catálogo de ejercicios. [orden] conserva el orden del catálogo de ejemplo. */
-@Entity(tableName = "ejercicio")
+/**
+ * Catálogo de ejercicios: los 21 de ejemplo y los descargados de ExerciseDB. [orden] conserva el
+ * orden del catálogo de ejemplo; los de ExerciseDB tienen 0 y se ordenan por nombre.
+ */
+@Entity(tableName = "ejercicio", indices = [Index("origen")])
 data class EjercicioEntidad(
     @PrimaryKey val id: String,
     val orden: Int,
@@ -23,6 +27,25 @@ data class EjercicioEntidad(
     val musculosSecundarios: String,
     val seriesSugeridas: Int,
     val repeticionesSugeridas: Int,
+    /** (v2) URL remota de la imagen; null en los de ejemplo (usan la imagen local de su categoría). */
+    @ColumnInfo(defaultValue = "NULL") val imagenUrl: String? = null,
+    /** (v2) Nombre de un OrigenEjercicio. Las filas de la v1 quedan como EJEMPLO. */
+    @ColumnInfo(defaultValue = "EJEMPLO") val origen: String = "EJEMPLO",
+)
+
+/**
+ * (v2) Una sola fila (clave = 0) con el avance de la descarga del catálogo de ExerciseDB.
+ *
+ * @property ultimaDescargaMs cuándo terminó la última descarga completa (null = nunca).
+ * @property cursorPendiente página donde continuar si la descarga se interrumpió; null si no hay
+ *   una descarga a medias.
+ */
+@Entity(tableName = "sincronizacion_catalogo")
+data class SincronizacionCatalogoEntidad(
+    @PrimaryKey val clave: Int = 0,
+    val ultimaDescargaMs: Long?,
+    val cursorPendiente: String?,
+    val enProgreso: Boolean,
 )
 
 // ---------------------------------------------------------------- planes

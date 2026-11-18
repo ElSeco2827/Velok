@@ -1,5 +1,6 @@
 package com.velok.app.data.local
 
+import androidx.room.AutoMigration
 import androidx.room.ConstructedBy
 import androidx.room.Database
 import androidx.room.RoomDatabase
@@ -14,8 +15,15 @@ const val NOMBRE_BASE_DATOS = "velok.db"
 /**
  * Base de datos local de Velok (Room). Al cambiar cualquier tabla hay que subir [version] y
  * escribir una migración; el esquema de cada versión se exporta a shared/schemas.
+ *
+ * Versiones:
+ * - 1: planes, sesiones, catálogo de ejemplo y cuentas.
+ * - 2: catálogo de ExerciseDB (columnas imagenUrl y origen en ejercicio, tabla
+ *   sincronizacion_catalogo). Migración automática: solo agrega columnas con valor por defecto y
+ *   una tabla nueva, así que planes, sesiones y cuentas no se tocan.
  */
 @Database(
+    autoMigrations = [AutoMigration(from = 1, to = 2)],
     entities = [
         EjercicioEntidad::class,
         PlanEntidad::class,
@@ -26,8 +34,9 @@ const val NOMBRE_BASE_DATOS = "velok.db"
         SerieSesionEntidad::class,
         CuentaEntidad::class,
         UsuarioActualEntidad::class,
+        SincronizacionCatalogoEntidad::class,
     ],
-    version = 1,
+    version = 2,
 )
 @ConstructedBy(ConstructorBaseDatos::class)
 abstract class BaseDatosVelok : RoomDatabase() {
@@ -36,6 +45,7 @@ abstract class BaseDatosVelok : RoomDatabase() {
     abstract fun sesionDao(): SesionDao
     abstract fun cuentaDao(): CuentaDao
     abstract fun semillaDao(): SemillaDao
+    abstract fun sincronizacionDao(): SincronizacionDao
 }
 
 /** Room genera la implementación (`actual`) para cada plataforma con KSP. */

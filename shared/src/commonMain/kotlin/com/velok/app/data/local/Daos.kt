@@ -23,8 +23,38 @@ interface EjercicioDao {
     @Query("SELECT COUNT(*) FROM ejercicio")
     suspend fun contar(): Int
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertar(ejercicios: List<EjercicioEntidad>)
+    /**
+     * Lo que se muestra en el catálogo: los de ExerciseDB si ya hay alguno descargado; si no, los
+     * de ejemplo. Los de ejemplo siguen en la tabla para los planes y el historial que los usan.
+     */
+    @Query(
+        """
+        SELECT * FROM ejercicio
+        WHERE origen = CASE WHEN EXISTS (SELECT 1 FROM ejercicio WHERE origen = 'EXERCISEDB')
+                            THEN 'EXERCISEDB' ELSE 'EJEMPLO' END
+        ORDER BY orden, nombre COLLATE NOCASE
+        """,
+    )
+    fun observarCatalogo(): Flow<List<EjercicioEntidad>>
+
+    @Query("SELECT COUNT(*) FROM ejercicio WHERE origen = 'EXERCISEDB'")
+    fun observarCantidadDescargados(): Flow<Int>
+
+    /**
+     * Guarda ejercicios descargados. Upsert (y no REPLACE) a propósito: REPLACE borra la fila
+     * antes de insertarla y rompería las llaves foráneas de los planes que ya la usan.
+     */
+    @Upsert
+    suspend fun guardar(ejercicios: List<EjercicioEntidad>)
+}
+
+@Dao
+interface SincronizacionDao {
+    @Query("SELECT * FROM sincronizacion_catalogo WHERE clave = 0")
+    suspend fun obtener(): SincronizacionCatalogoEntidad?
+
+    @Upsert
+    suspend fun guardar(estado: SincronizacionCatalogoEntidad)
 }
 
 @Dao
