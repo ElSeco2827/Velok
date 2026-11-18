@@ -35,9 +35,13 @@ domain/        Kotlin puro: sin Compose, sin recursos, sin textos visibles
   repository/  Interfaces (Actividad, Auth, Ejercicio, Plan, Sesion, Usuario)
   usecase/     Un caso de uso por clase con `operator fun invoke()` (`suspend` o que devuelve `Flow`)
 data/
-  repository/  Implementaciones (hoy Mock*, con datos en DatosMock.kt; luego Health Connect/HealthKit
-               y ExerciseDB). Planes, historial y cuentas viven en memoria con MutableStateFlow.
-               MockCuentaRepository implementa AuthRepository y UsuarioRepository a la vez.
+  local/       Base de datos Room (BaseDatosVelok): Entidades.kt, Relaciones.kt, Daos.kt,
+               Conversiones.kt (entidad <-> dominio), SembradorDatos (siembra inicial) y
+               seguridad/HashContrasenas (PBKDF2 con expect/actual)
+  repository/  Local* (la app: Plan, Sesion, Ejercicio, Cuenta, sobre Room) y Mock* (en memoria,
+               solo para pruebas y vistas previas). Actividad sigue en Mock hasta Health
+               Connect/HealthKit. LocalCuentaRepository implementa AuthRepository y
+               UsuarioRepository a la vez. DatosMock.kt tiene los datos de ejemplo de ambos.
                Cuenta de prueba: checo@velok.app / velok2026 (cuestionario ya completo).
 di/            Módulos de Koin (dataModule, domainModule, presentationModule)
 presentation/
@@ -55,7 +59,8 @@ Reglas:
   `XxxContenido(estado, callbacks)` sin estado, que es el que se previsualiza.
 - El dominio usa enums (`TipoMetrica`, `TipoCategoria`, `TipoEquipo`, `Musculo`...); su texto e ícono
   se resuelven en `presentation/util/RecursosUi.kt`.
-- Las reglas de negocio van en el dominio y se prueban en `commonTest` (sin coroutines ni UI).
+- Las reglas de negocio van en el dominio y se prueban en `commonTest` (sin coroutines ni UI);
+  los repositorios locales, en `androidHostTest` (ver "Persistencia local").
   Los ViewModels solo orquestan: llaman casos de uso o aplican funciones del dominio.
 - Pantallas de detalle: rutas tipadas con id (`RutaDetallePlan(planId)`) y ViewModel creado con
   `koinViewModel(key = ...) { parametersOf(id) }`.
@@ -70,7 +75,27 @@ Reglas:
 - Los casos de uso de cuenta se llaman `Ingresar...`/`Registrar...` para no confundirlos con
   `IniciarSesionUseCase`, que inicia una sesión de **entrenamiento**.
 - Código específico de plataforma solo en `androidMain` / `iosMain` vía `expect/actual`.
-  `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo.
+  `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo. Otros
+  ejemplos: `moduloPlataforma()` (ruta de la base de datos) y el hash de contraseñas.
+
+## Persistencia local
+- **Room KMP** (`room`, `ksp`, `sqlite-bundled` en `libs.versions.toml`) con `BundledSQLiteDriver`;
+  la configuración común está en `crearBaseDatos()` y la ruta del archivo en `moduloPlataforma()`
+  (`androidMain`: `context.getDatabasePath`; `iosMain`: carpeta Documents).
+- Planes, historial, catálogo de ejercicios y cuentas se guardan en la base de datos y sobreviven
+  al cerrar la app. Los repositorios exponen `Flow` (los DAO de Room emiten solos al cambiar).
+- Las entidades de Room viven solo en `data/local`; el dominio nunca las ve (se convierten en
+  `Conversiones.kt`). Los enums se guardan por nombre y las fechas como texto ISO o milisegundos.
+- Al cambiar una tabla: subir `version` en `BaseDatosVelok`, escribir la migración y conservar el
+  esquema exportado en `shared/schemas/`.
+- La primera vez, `SembradorDatos` copia `DatosMock` (ejercicios, 4 planes, historial, cuenta demo).
+  La base se considera nueva si no tiene ejercicios, así los planes borrados no reaparecen.
+- **Contraseñas nunca en texto plano**: `HashContrasenas` guarda `pbkdf2-sha256$iteraciones$sal$hash`
+  (120,000 iteraciones, sal aleatoria de 16 bytes) y compara en tiempo constante.
+- La sesión iniciada se guarda en la tabla `usuario_actual`; "Cerrar sesión" (Perfil) la borra y
+  vuelve a la selección de inicio limpiando la pila de navegación.
+- Pruebas de los repositorios locales en `androidHostTest` con Robolectric y Room en memoria
+  (`Pruebas.kt` arma los repositorios con un hash rápido y una fecha fija).
 
 ## Tema visual
 - Acento verde lima `#D3FA6E` (`VelokTheme.colores.acento`). Para texto/íconos sobre fondo claro usar
@@ -103,7 +128,8 @@ Reglas:
 ## Convenciones de nombres
 - Pantallas `XxxScreen`, contenido sin estado `XxxContenido`, ViewModels `XxxViewModel`, estado `XxxUiState`.
 - Casos de uso `VerboSustantivoUseCase` (`ObtenerPlanesUseCase`).
-- Repositorios: interfaz `XxxRepository`, implementaciones `MockXxxRepository`, `ApiXxxRepository`, etc.
+- Repositorios: interfaz `XxxRepository`, implementaciones `LocalXxxRepository`, `MockXxxRepository`,
+  `ApiXxxRepository`, etc. Tablas de Room: `XxxEntidad`; consultas: `XxxDao`.
 - Componentes reutilizables: `XxxCard`, `VelokXxx` para piezas de marca (`VelokHeader`, `VelokBottomBar`).
 - Rutas `RutaXxx` (`data object` serializable).
 - Recursos: `nav_*`, `metrica_*`, `valor_*`, `categoria_*`, `tab_*`, `equipo_*`, `musculo_*`,

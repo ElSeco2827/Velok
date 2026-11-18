@@ -24,6 +24,7 @@ import com.velok.app.presentation.sesion.SesionScreen
 @Composable
 fun VelokNavHost(
     navController: NavHostController,
+    onSesionCerrada: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val abrirEjercicio: (String) -> Unit = { navController.navigate(RutaDetalleEjercicio(it)) }
@@ -54,7 +55,7 @@ fun VelokNavHost(
             )
         }
         composable<RutaActividad> { ProgresoScreen() }
-        composable<RutaPerfil> { PerfilScreen() }
+        composable<RutaPerfil> { PerfilScreen(onSesionCerrada = onSesionCerrada) }
 
         // Detalles.
         composable<RutaCategoria> { entrada ->

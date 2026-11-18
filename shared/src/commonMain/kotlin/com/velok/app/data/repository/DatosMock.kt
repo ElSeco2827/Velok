@@ -2,17 +2,35 @@ package com.velok.app.data.repository
 
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.EjercicioPlan
+import com.velok.app.domain.model.MetaEntrenamiento
 import com.velok.app.domain.model.Musculo
+import com.velok.app.domain.model.PerfilFisico
 import com.velok.app.domain.model.Plan
 import com.velok.app.domain.model.Serie
+import com.velok.app.domain.model.SesionEntrenamiento
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.model.TipoSerie
+import com.velok.app.domain.model.UnidadPeso
+import com.velok.app.domain.model.Usuario
+import com.velok.app.domain.model.iniciarSesion
+import kotlinx.datetime.DateTimeUnit
+import kotlinx.datetime.DayOfWeek
 import kotlinx.datetime.LocalDate
+import kotlinx.datetime.LocalTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.atTime
+import kotlinx.datetime.minus
+import kotlinx.datetime.toInstant
+import kotlinx.datetime.todayIn
+import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.Duration.Companion.minutes
 import velok.shared.generated.resources.Res
 
 /**
- * Datos falsos compartidos por los repositorios mock. Las imágenes son placeholders locales
+ * Datos de ejemplo. Los usan los repositorios mock y, la primera vez que se abre la app, se
+ * copian a la base de datos local (SembradorDatos). Las imágenes son placeholders locales
  * expuestos como URI, así la UI las carga con Coil igual que cargará las URLs de ExerciseDB.
  */
 internal object DatosMock {
@@ -116,4 +134,72 @@ internal object DatosMock {
             ),
         ),
     )
+
+    // ------------------------------------------------------------------ cuenta demo
+
+    /** Cuenta de demostración con el cuestionario ya completo (entra directo a la app). */
+    const val CORREO_DEMO = "checo@velok.app"
+    const val CONTRASENA_DEMO = "velok2026"
+    const val CORREO_GOOGLE = "checo.google@gmail.com"
+
+    val usuarioDemo = Usuario(
+        id = "usuario-demo",
+        nombre = "Checo",
+        correo = CORREO_DEMO,
+        perfil = PerfilFisico(
+            fechaNacimiento = LocalDate(2004, 4, 25),
+            unidadPeso = UnidadPeso.KG,
+            estaturaCm = 170,
+            pesoKg = 100.0,
+            meta = MetaEntrenamiento.PERDER_GRASA,
+        ),
+    )
+
+    // ------------------------------------------------------------------ historial
+
+    private const val DIAS_DE_HISTORIAL = 42
+    private const val PROBABILIDAD_DE_ENTRENAR = 0.75
+    private const val INCREMENTO_KG_POR_SEMANA = 1.25
+    private const val VARIACION_KG = 2.5
+
+    // Cada plan de ejemplo se entrena el día de la semana de su nombre.
+    private val planPorDia = mapOf(
+        DayOfWeek.MONDAY to "plan-lunes",
+        DayOfWeek.TUESDAY to "plan-martes",
+        DayOfWeek.WEDNESDAY to "plan-miercoles",
+        DayOfWeek.SATURDAY to "plan-sabado",
+    )
+
+    /**
+     * Sesiones de las últimas 6 semanas para que las gráficas de progreso tengan datos.
+     * Es determinista (semilla fija) y las fechas son relativas a hoy.
+     */
+    fun historial(clock: Clock): List<SesionEntrenamiento> {
+        val zona = TimeZone.currentSystemDefault()
+        val hoy = clock.todayIn(zona)
+        val aleatorio = Random(seed = 7)
+        return (DIAS_DE_HISTORIAL downTo 1).mapNotNull { diasAtras ->
+            val fecha = hoy.minus(diasAtras, DateTimeUnit.DAY)
+            val plan = planes.firstOrNull { it.id == planPorDia[fecha.dayOfWeek] } ?: return@mapNotNull null
+            if (aleatorio.nextDouble() > PROBABILIDAD_DE_ENTRENAR) return@mapNotNull null
+
+            // El peso sube poco a poco (en el pasado se levantaba menos que en el plan actual),
+            // con días mejores y peores para que la gráfica no sea una línea recta.
+            val semanasAtras = diasAtras / 7
+            val variacion = aleatorio.nextInt(-1, 2) * VARIACION_KG
+            val inicio = fecha.atTime(LocalTime(18, 0)).toInstant(zona)
+            val sesion = plan.iniciarSesion(id = "historial-$diasAtras", inicio = inicio)
+            sesion.copy(
+                fin = inicio + aleatorio.nextInt(30, 50).minutes,
+                ejercicios = sesion.ejercicios.map { ej ->
+                    ej.copy(series = ej.series.map { serie ->
+                        val peso = serie.pesoKg?.let {
+                            (it - semanasAtras * INCREMENTO_KG_POR_SEMANA + variacion).coerceAtLeast(0.0)
+                        }
+                        serie.copy(pesoKg = peso, completada = true)
+                    })
+                },
+            )
+        }
+    }
 }

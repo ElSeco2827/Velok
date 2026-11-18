@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -61,6 +62,10 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.math.ceil
 import velok.shared.generated.resources.Res
+import velok.shared.generated.resources.cancelar
+import velok.shared.generated.resources.cerrar_sesion
+import velok.shared.generated.resources.cerrar_sesion_mensaje
+import velok.shared.generated.resources.cerrar_sesion_titulo
 import velok.shared.generated.resources.esta_semana
 import velok.shared.generated.resources.foto_perfil
 import velok.shared.generated.resources.grafica_horas
@@ -76,11 +81,16 @@ private const val SEMANAS_ENTRE_ETIQUETAS = 2
 
 /** Perfil (diseño "Pantalla progreso-1"): saludo, horas por semana y radar de grupos musculares. */
 @Composable
-fun PerfilScreen(viewModel: PerfilViewModel = koinViewModel()) {
+fun PerfilScreen(onSesionCerrada: () -> Unit, viewModel: PerfilViewModel = koinViewModel()) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
     // Ejemplo visible de expect/actual: el nombre viene de androidMain o iosMain.
     val plataforma = remember { getPlatform().name }
-    PerfilContenido(estado, plataforma, viewModel::cambiarRango)
+    PerfilContenido(
+        estado = estado,
+        plataforma = plataforma,
+        onRango = viewModel::cambiarRango,
+        onCerrarSesion = { viewModel.cerrarSesion(onSesionCerrada) },
+    )
 }
 
 @Composable
@@ -88,10 +98,12 @@ fun PerfilContenido(
     estado: PerfilUiState,
     plataforma: String,
     onRango: (RangoTiempo) -> Unit,
+    onCerrarSesion: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val colores = VelokTheme.colores
     val usuario = estado.usuario
+    var confirmarCierre by remember { mutableStateOf(false) }
     if (estado.cargando || usuario == null) {
         EstadoCargando(modifier)
         return
@@ -131,7 +143,33 @@ fun PerfilContenido(
                 color = colores.sobreFondoSecundario,
                 modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 16.dp),
             )
+            TextButton(
+                onClick = { confirmarCierre = true },
+                modifier = Modifier.align(Alignment.CenterHorizontally).padding(top = 8.dp),
+            ) {
+                Text(stringResource(Res.string.cerrar_sesion), color = colores.alerta, style = VelokTheme.tipografia.bodyLarge)
+            }
         }
+    }
+
+    if (confirmarCierre) {
+        AlertDialog(
+            onDismissRequest = { confirmarCierre = false },
+            title = { Text(stringResource(Res.string.cerrar_sesion_titulo)) },
+            text = { Text(stringResource(Res.string.cerrar_sesion_mensaje)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    confirmarCierre = false
+                    onCerrarSesion()
+                }) { Text(stringResource(Res.string.cerrar_sesion), color = colores.alerta) }
+            },
+            dismissButton = {
+                TextButton(onClick = { confirmarCierre = false }) {
+                    Text(stringResource(Res.string.cancelar), color = colores.textoPrincipal)
+                }
+            },
+            containerColor = colores.superficie,
+        )
     }
 }
 
@@ -235,6 +273,7 @@ private fun PerfilContenidoPreview() {
                 ),
                 plataforma = "Android 35",
                 onRango = {},
+                onCerrarSesion = {},
             )
         }
     }

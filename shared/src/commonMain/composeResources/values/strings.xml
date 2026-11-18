@@ -90,6 +90,11 @@
     <string name="borrar_rutina_mensaje">Se eliminará «%1$s». Esta acción no se puede deshacer.</string>
     <string name="borrar">Borrar</string>
     <string name="cancelar">Cancelar</string>
+
+    <!-- Cerrar sesión (Perfil) -->
+    <string name="cerrar_sesion">Cerrar sesión</string>
+    <string name="cerrar_sesion_titulo">¿Cerrar sesión?</string>
+    <string name="cerrar_sesion_mensaje">Volverás a la pantalla de inicio. Tus rutinas y entrenamientos se quedan guardados en este dispositivo.</string>
     <string name="cambiar_tipo_serie">Serie %1$s. Toca para cambiar entre normal y calentamiento</string>
 
     <!-- Series -->

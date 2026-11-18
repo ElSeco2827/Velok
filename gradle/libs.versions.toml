@@ -19,6 +19,15 @@ kotlin = "2.4.20"
 material3 = "1.12.0-alpha03"
 navigation = "2.9.2"
 navigationevent = "1.1.0"
+room = "2.8.5"
+# Versión de androidx.sqlite que declara Room 2.8.5.
+sqlite = "2.6.2"
+# KSP 2.x tiene versión propia (ya no sigue la de Kotlin); 2.3.14 probado con Kotlin 2.4.20 y AGP 9.3.3.
+ksp = "2.3.14"
+robolectric = "4.18.1"
+androidx-test-core = "1.7.0"
+# Misma versión de corrutinas que ya resuelve el proyecto.
+kotlinx-coroutines = "1.10.2"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -47,8 +56,16 @@ koin-compose-viewmodel = { module = "io.insert-koin:koin-compose-viewmodel", ver
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serialization-core = { module = "org.jetbrains.kotlinx:kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
+room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
+robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
+androidx-test-core = { module = "androidx.test:core", version.ref = "androidx-test-core" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinx-coroutines" }
 
 [plugins]
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+room = { id = "androidx.room", version.ref = "room" }
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }

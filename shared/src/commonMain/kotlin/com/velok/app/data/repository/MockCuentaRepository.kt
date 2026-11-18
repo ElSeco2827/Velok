@@ -1,10 +1,8 @@
 package com.velok.app.data.repository
 
 import com.velok.app.domain.model.ErrorCuenta
-import com.velok.app.domain.model.MetaEntrenamiento
 import com.velok.app.domain.model.PerfilFisico
 import com.velok.app.domain.model.ResultadoAuth
-import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.domain.model.Usuario
 import com.velok.app.domain.repository.AuthRepository
 import com.velok.app.domain.repository.UsuarioRepository
@@ -12,35 +10,20 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.datetime.LocalDate
 
 /**
- * Cuentas en memoria mientras no hay backend. Implementa autenticación y usuario actual en la
+ * Cuentas en memoria. Implementa autenticación y usuario actual en la
  * misma clase porque comparten los datos (quién inició sesión).
  *
- * Solo para pruebas: guarda las contraseñas tal cual. Un backend real las guardaría cifradas
- * (con hash) y nunca las enviaría de vuelta a la app.
+ * Solo para pruebas y vistas previas: guarda las contraseñas tal cual. La app usa
+ * LocalCuentaRepository, que guarda un hash.
  */
 class MockCuentaRepository : AuthRepository, UsuarioRepository {
 
     private class Cuenta(val usuario: Usuario, val contrasena: String)
 
     private val cuentas = mutableMapOf(
-        CORREO_DEMO to Cuenta(
-            usuario = Usuario(
-                id = "usuario-demo",
-                nombre = "Checo",
-                correo = CORREO_DEMO,
-                perfil = PerfilFisico(
-                    fechaNacimiento = LocalDate(2004, 4, 25),
-                    unidadPeso = UnidadPeso.KG,
-                    estaturaCm = 170,
-                    pesoKg = 100.0,
-                    meta = MetaEntrenamiento.PERDER_GRASA,
-                ),
-            ),
-            contrasena = CONTRASENA_DEMO,
-        ),
+        DatosMock.CORREO_DEMO to Cuenta(DatosMock.usuarioDemo, DatosMock.CONTRASENA_DEMO),
     )
 
     private val actual = MutableStateFlow<Usuario?>(null)
@@ -89,6 +72,10 @@ class MockCuentaRepository : AuthRepository, UsuarioRepository {
         actual.update { actualizado }
     }
 
+    override suspend fun cerrarSesion() {
+        actual.value = null
+    }
+
     private fun iniciarSesion(usuario: Usuario): ResultadoAuth {
         actual.value = usuario
         return ResultadoAuth.Exito(usuario)
@@ -96,11 +83,8 @@ class MockCuentaRepository : AuthRepository, UsuarioRepository {
 
     private fun nuevoId(): String = "usuario-${siguienteId++}"
 
-    companion object {
-        /** Cuenta de demostración con el cuestionario ya completo (entra directo a la app). */
-        const val CORREO_DEMO = "checo@velok.app"
-        const val CONTRASENA_DEMO = "velok2026"
-        private const val CORREO_GOOGLE = "checo.google@gmail.com"
-        private const val RETRASO_SIMULADO_MS = 600L
+    private companion object {
+        const val CORREO_GOOGLE = DatosMock.CORREO_GOOGLE
+        const val RETRASO_SIMULADO_MS = 600L
     }
 }
