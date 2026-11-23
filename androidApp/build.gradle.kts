@@ -18,6 +18,8 @@ dependencies {
 
     implementation(libs.compose.uiToolingPreview)
     debugImplementation(libs.compose.uiTooling)
+    // Solo debug: pantalla para insertar datos de prueba en Health Connect (src/debug).
+    debugImplementation(libs.health.connect.client)
 }
 
 android {

@@ -396,7 +396,8 @@ Versiones tomadas de [`gradle/libs.versions.toml`](../gradle/libs.versions.toml)
 | AndroidX Activity Compose | 1.13.0 | `setContent` y `enableEdgeToEdge` en `MainActivity` |
 | kotlin-test | 2.4.20 | Pruebas unitarias en `commonTest` |
 
-SDK Android: `minSdk` 24, `compileSdk` y `targetSdk` 37. Targets iOS: `iosArm64` (dispositivo)
+SDK Android: `minSdk` 24 en esta entrega (desde la integración con Health Connect es 26, el mínimo
+de su librería), `compileSdk` y `targetSdk` 37. Targets iOS: `iosArm64` (dispositivo)
 e `iosSimulatorArm64` (simulador en Mac con Apple Silicon).
 
 ---

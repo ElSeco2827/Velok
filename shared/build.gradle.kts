@@ -55,6 +55,9 @@ kotlin {
             // Motor HTTP de Android y GIF animados (coil-gif solo existe para Android).
             implementation(libs.ktor.client.okhttp)
             implementation(libs.coil.gif)
+            // Datos de salud (solo lectura) y lanzador del diálogo de permisos de Health Connect.
+            implementation(libs.health.connect.client)
+            implementation(libs.androidx.activity.compose)
         }
         iosMain.dependencies {
             // Motor HTTP de iOS (NSURLSession).
