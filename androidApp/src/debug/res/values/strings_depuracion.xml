@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Textos de la pantalla de datos de prueba: solo existen en la versión debug. -->
+<resources>
+    <string name="depuracion_titulo">Datos de prueba de salud (debug)</string>
+    <string name="depuracion_explicacion">Solo para pruebas en el emulador. Inserta en Health Connect pasos, distancia, calorías activas y ritmo cardiaco de hoy, desde las 7:00 hasta la hora actual. Velok solo lee estos datos; esta pantalla no existe en la versión release.</string>
+    <string name="depuracion_insertar">Insertar datos de prueba de hoy</string>
+    <string name="depuracion_borrar">Borrar los datos de prueba de hoy</string>
+    <string name="depuracion_sin_health_connect">Health Connect no está disponible en este dispositivo.</string>
+    <string name="depuracion_sin_permiso">Falta el permiso de escritura. Vuelve a tocar el botón y acepta los permisos.</string>
+    <string name="depuracion_insertados">Listo: %1$d registros insertados. Abre Velok para verlos en Inicio.</string>
+    <string name="depuracion_borrados">Listo: se borraron los datos de prueba de hoy.</string>
+    <string name="depuracion_error">Error: %1$s</string>
+</resources>
