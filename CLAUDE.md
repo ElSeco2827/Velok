@@ -97,6 +97,7 @@ Reglas:
   `Conversiones.kt`). Los enums se guardan por nombre y las fechas como texto ISO o milisegundos.
 - Al cambiar una tabla: subir `version` en `BaseDatosVelok`, escribir la migración y conservar el
   esquema exportado en `shared/schemas/`.
+- Versión actual de la base de datos: **3**.
 - La primera vez, `SembradorDatos` copia `DatosMock` (ejercicios, 4 planes, historial, cuenta demo).
   La base se considera nueva si no tiene ejercicios, así los planes borrados no reaparecen.
 - **Contraseñas nunca en texto plano**: `HashContrasenas` guarda `pbkdf2-sha256$iteraciones$sal$hash`
@@ -105,8 +106,39 @@ Reglas:
   vuelve a la selección de inicio limpiando la pila de navegación.
 - Pruebas de los repositorios locales en `androidHostTest` con Robolectric y Room en memoria
   (`Pruebas.kt` arma los repositorios con un hash rápido, una fecha fija y un servidor sin conexión).
-- Migraciones: v1 -> v2 automática (`@AutoMigration`), probada en `MigracionTest` creando una base
-  v1 real a partir de `shared/schemas/.../1.json`.
+- Migraciones: v1 -> v2 automática (`@AutoMigration`); v2 -> v3 manual (`MIGRACION_2_3` en
+  `Migraciones.kt`, registrada con `conMigraciones()`), escrita sobre `SQLiteConnection`. Se prueban
+  en `MigracionTest` creando bases reales a partir de `shared/schemas/.../N.json`. Las pruebas usan
+  `AndroidSQLiteDriver` (como la app usa un driver, Room migra por `migrate(SQLiteConnection)`).
+
+## Unidades de peso (kg / lb)
+- **Los pesos se guardan siempre en kg** (planes, sesiones, perfil). La unidad del usuario
+  (`PerfilFisico.unidadPeso`) solo cambia cómo se muestran y capturan.
+- Conversión con funciones puras del dominio (`pesoEnUnidad`, `pesoAKg`,
+  `MetricaProgreso.enUnidad`), probadas en `UnidadesPesoTest`. Lo escrito se pasa a kg **sin
+  redondear** (135 lb -> 61.2349... kg -> 135 lb); el redondeo (1 decimal) es solo al mostrar.
+- En presentación: `CampoPeso(valorKg, unidad, onCambioKg)` convierte en ambos sentidos;
+  `formatearPeso`, `textoMetrica` y `UnidadPeso.columna` en `presentation/util/Unidades.kt`.
+  Los ViewModels siguen trabajando en kg y exponen `unidad` en su UiState
+  (`ObtenerUnidadPesoUseCase`, un Flow: al cambiarla en Perfil se actualizan todas las pantallas).
+- Nunca escribir "kg" fijo en una pantalla: usar `unidad.columna` / `unidad.sufijo`.
+
+## Búsqueda del catálogo
+- Se busca en SQLite (`EjercicioDao.buscar`), nunca filtrando en memoria los 1,500 ejercicios.
+  El filtro es `FiltroCatalogo` (texto, equipo, categoría y músculos/categorías en español).
+- Sin mayúsculas ni acentos: columna `nombreBusqueda` = `normalizarBusqueda(nombre)` (dominio),
+  calculada en Kotlin al guardar; el texto escrito se normaliza igual y se escapa para `LIKE`
+  (`patronLike`: `%` y `_` se buscan literal).
+- Espera de 300 ms (`debounce`) y búsqueda por músculo/categoría en español en
+  `presentation/util/BusquedaEjercicios.kt`, compartida por la pestaña Ejercicio y la hoja
+  "Agregar ejercicio" del editor (`BuscadorEjercicios`).
+
+## Textos legales
+- `documento_terminos` y `documento_privacidad` en `strings.xml` describen lo que la app hace hoy.
+  Los datos del equipo responsable (nombres, correo, domicilio, fecha, plazos, jurisdicción) los
+  dio el equipo: nunca inventarlos ni cambiarlos sin su indicación. "> " marca la nota de proyecto
+  escolar, que debe quedarse visible. Al cambiar lo que hace la app, actualizar estos textos y su
+  fecha de última actualización.
 
 ## Capa remota (ExerciseDB)
 - Todo el acceso a red vive en `data/remote/`; las pantallas, ViewModels y casos de uso nunca
