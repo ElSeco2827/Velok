@@ -2,6 +2,8 @@ package com.velok.app.data.local
 
 import android.content.Context
 import androidx.room.Room
+import androidx.room.RoomDatabase
+import androidx.sqlite.driver.AndroidSQLiteDriver
 import androidx.test.core.app.ApplicationProvider
 import com.velok.app.data.local.seguridad.HashContrasenas
 import com.velok.app.data.remote.ClienteExerciseDb
@@ -39,15 +41,22 @@ val hashRapido = HashContrasenas(iteraciones = 1_000)
 
 val contexto: Context get() = ApplicationProvider.getApplicationContext()
 
+/**
+ * Igual que la app: con un SQLiteDriver y las migraciones manuales. La app usa
+ * BundledSQLiteDriver (sus binarios son de Android y no corren en la JVM de la computadora); aquí
+ * se usa AndroidSQLiteDriver sobre el SQLite de Robolectric. Con un driver, Room ejecuta las
+ * migraciones por `migrate(SQLiteConnection)`, el mismo camino que en el teléfono.
+ */
+private fun RoomDatabase.Builder<BaseDatosVelok>.comoLaApp(): BaseDatosVelok =
+    conMigraciones().setDriver(AndroidSQLiteDriver()).build()
+
 /** Base de datos en memoria: cada prueba empieza vacía. */
 fun baseDatosEnMemoria(): BaseDatosVelok =
-    Room.inMemoryDatabaseBuilder<BaseDatosVelok>(contexto).allowMainThreadQueries().build()
+    Room.inMemoryDatabaseBuilder<BaseDatosVelok>(contexto).comoLaApp()
 
 /** Base de datos en un archivo, para probar que los datos siguen ahí al volver a abrirla. */
 fun baseDatosEnArchivo(nombre: String): BaseDatosVelok =
-    Room.databaseBuilder<BaseDatosVelok>(contexto, contexto.getDatabasePath(nombre).absolutePath)
-        .allowMainThreadQueries()
-        .build()
+    Room.databaseBuilder<BaseDatosVelok>(contexto, contexto.getDatabasePath(nombre).absolutePath).comoLaApp()
 
 /** Reloj que las pruebas pueden adelantar (por ejemplo, 8 días para la vigencia del catálogo). */
 class RelojAjustable(var ahora: Instant = relojFijo.now()) : Clock {

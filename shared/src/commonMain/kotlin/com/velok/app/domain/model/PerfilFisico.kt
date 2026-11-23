@@ -26,5 +26,23 @@ fun librasAKg(libras: Double): Double = libras * KG_POR_LIBRA
 
 fun kgALibras(kg: Double): Double = kg / KG_POR_LIBRA
 
+/**
+ * Regla de unidades: los pesos se guardan siempre en kg. Esta función los pasa a la unidad del
+ * usuario solo para mostrarlos (sin redondear; el redondeo es de la presentación).
+ */
+fun pesoEnUnidad(kg: Double, unidad: UnidadPeso): Double = when (unidad) {
+    UnidadPeso.KG -> kg
+    UnidadPeso.LB -> kgALibras(kg)
+}
+
+/**
+ * Lo que el usuario escribe en su unidad, a kg para guardarlo. No se redondea: así 135 lb se
+ * guarda como 61.2349... kg y vuelve a mostrarse como 135 lb.
+ */
+fun pesoAKg(valor: Double, unidad: UnidadPeso): Double = when (unidad) {
+    UnidadPeso.KG -> valor
+    UnidadPeso.LB -> librasAKg(valor)
+}
+
 /** Años cumplidos en [hoy]. */
 fun edadEn(fechaNacimiento: LocalDate, hoy: LocalDate): Int = fechaNacimiento.yearsUntil(hoy)

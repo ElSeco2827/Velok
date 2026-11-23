@@ -12,6 +12,8 @@ data class EjercicioUiState(
     val error: Boolean = false,
     /** null = sin filtro (todos los equipos). */
     val equipo: TipoEquipo? = null,
+    /** Texto del buscador tal como lo escribe el usuario. */
+    val busqueda: String = "",
     val ejercicios: List<Ejercicio> = emptyList(),
     val categorias: List<CategoriaEjercicio> = emptyList(),
     /** No se pudo descargar el catálogo y solo hay ejercicios de ejemplo (aviso discreto). */

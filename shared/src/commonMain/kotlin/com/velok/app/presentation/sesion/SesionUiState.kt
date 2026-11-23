@@ -1,6 +1,7 @@
 package com.velok.app.presentation.sesion
 
 import com.velok.app.domain.model.SesionEntrenamiento
+import com.velok.app.domain.model.UnidadPeso
 import kotlin.time.Instant
 
 /** Descanso en curso tras completar una serie del ejercicio [indiceEjercicio]. */
@@ -15,4 +16,6 @@ data class SesionUiState(
     val descanso: DescansoActivo? = null,
     /** Se pidió terminar sin series completadas: hay que confirmar que se sale sin guardar. */
     val confirmarSalida: Boolean = false,
+    /** Unidad en la que se muestran pesos, ANTERIOR y volumen (la sesión guarda kg). */
+    val unidad: UnidadPeso = UnidadPeso.KG,
 )

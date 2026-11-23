@@ -3,6 +3,7 @@ package com.velok.app.presentation.detalleejercicio
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.MetricaProgreso
 import com.velok.app.domain.model.RangoTiempo
+import com.velok.app.domain.model.UnidadPeso
 
 data class DetalleEjercicioUiState(
     val cargando: Boolean = true,
@@ -10,6 +11,7 @@ data class DetalleEjercicioUiState(
     val ejercicio: Ejercicio? = null,
     val metrica: MetricaProgreso = MetricaProgreso.PESO,
     val rango: RangoTiempo = RangoTiempo.MES,
-    /** Un valor por sesión, en orden de fecha. */
+    /** Un valor por sesión, en orden de fecha (pesos ya en [unidad]). */
     val progreso: List<Double> = emptyList(),
+    val unidad: UnidadPeso = UnidadPeso.KG,
 )

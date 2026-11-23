@@ -1,6 +1,7 @@
 package com.velok.app.presentation.perfil
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -43,13 +45,17 @@ import coil3.compose.AsyncImage
 import com.velok.app.domain.model.ComparacionMuscular
 import com.velok.app.domain.model.GrupoMuscular
 import com.velok.app.domain.model.HorasSemana
+import com.velok.app.domain.model.MetaEntrenamiento
+import com.velok.app.domain.model.PerfilFisico
 import com.velok.app.domain.model.RangoTiempo
 import com.velok.app.domain.model.ResumenHoras
+import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.domain.model.Usuario
 import com.velok.app.getPlatform
 import com.velok.app.presentation.components.EstadoCargando
 import com.velok.app.presentation.components.GraficaBarras
 import com.velok.app.presentation.components.GraficaRadar
+import com.velok.app.presentation.components.OpcionPildora
 import com.velok.app.presentation.theme.VelokTheme
 import com.velok.app.presentation.util.formatearNumero
 import com.velok.app.presentation.util.formatoCorto
@@ -75,6 +81,7 @@ import velok.shared.generated.resources.horas_valor
 import velok.shared.generated.resources.ic_flecha_abajo
 import velok.shared.generated.resources.plataforma_actual
 import velok.shared.generated.resources.saludo
+import velok.shared.generated.resources.unidad_peso
 
 /** Cada cuántas semanas se escribe una fecha en el eje X de las barras. */
 private const val SEMANAS_ENTRE_ETIQUETAS = 2
@@ -89,6 +96,7 @@ fun PerfilScreen(onSesionCerrada: () -> Unit, viewModel: PerfilViewModel = koinV
         estado = estado,
         plataforma = plataforma,
         onRango = viewModel::cambiarRango,
+        onUnidad = viewModel::cambiarUnidad,
         onCerrarSesion = { viewModel.cerrarSesion(onSesionCerrada) },
     )
 }
@@ -98,6 +106,7 @@ fun PerfilContenido(
     estado: PerfilUiState,
     plataforma: String,
     onRango: (RangoTiempo) -> Unit,
+    onUnidad: (UnidadPeso) -> Unit,
     onCerrarSesion: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -128,6 +137,9 @@ fun PerfilContenido(
                 style = VelokTheme.tipografia.headlineMedium,
                 color = colores.sobreFondo,
             )
+        }
+        usuario.perfil?.let { perfil ->
+            SelectorUnidad(perfil.unidadPeso, onUnidad)
         }
         Spacer(Modifier.height(16.dp))
         Column(Modifier.fillMaxWidth().background(colores.fondoProfundo).padding(vertical = 16.dp)) {
@@ -170,6 +182,31 @@ fun PerfilContenido(
             },
             containerColor = colores.superficie,
         )
+    }
+}
+
+/** Unidad en la que se ven y escriben los pesos en toda la app (los datos siguen en kg). */
+@Composable
+private fun SelectorUnidad(seleccionada: UnidadPeso, onUnidad: (UnidadPeso) -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp).selectableGroup(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = stringResource(Res.string.unidad_peso),
+            style = VelokTheme.tipografia.bodyLarge,
+            color = VelokTheme.colores.sobreFondo,
+            modifier = Modifier.weight(1f),
+        )
+        UnidadPeso.entries.forEach { unidad ->
+            OpcionPildora(
+                texto = stringResource(unidad.nombre),
+                seleccionada = unidad == seleccionada,
+                onClick = { onUnidad(unidad) },
+                modifier = Modifier.width(64.dp),
+            )
+        }
     }
 }
 
@@ -260,7 +297,12 @@ private fun PerfilContenidoPreview() {
             PerfilContenido(
                 estado = PerfilUiState(
                     cargando = false,
-                    usuario = Usuario(id = "u", nombre = "Checo", correo = "checo@velok.app"),
+                    usuario = Usuario(
+                        id = "u",
+                        nombre = "Checo",
+                        correo = "checo@velok.app",
+                        perfil = PerfilFisico(LocalDate(2004, 4, 25), UnidadPeso.LB, 170, 100.0, MetaEntrenamiento.PERDER_GRASA),
+                    ),
                     horas = ResumenHoras(
                         horasEstaSemana = 3.0,
                         semanas = listOf(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 2.0, 1.1, 1.5, 0.0, 1.8, 2.2, 2.7)
@@ -273,6 +315,7 @@ private fun PerfilContenidoPreview() {
                 ),
                 plataforma = "Android 35",
                 onRango = {},
+                onUnidad = {},
                 onCerrarSesion = {},
             )
         }

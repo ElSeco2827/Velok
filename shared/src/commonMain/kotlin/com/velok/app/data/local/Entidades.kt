@@ -31,6 +31,11 @@ data class EjercicioEntidad(
     @ColumnInfo(defaultValue = "NULL") val imagenUrl: String? = null,
     /** (v2) Nombre de un OrigenEjercicio. Las filas de la v1 quedan como EJEMPLO. */
     @ColumnInfo(defaultValue = "EJEMPLO") val origen: String = "EJEMPLO",
+    /**
+     * (v3) [nombre] normalizado para buscar (minúsculas, sin acentos; ver normalizarBusqueda).
+     * SQLite no sabe quitar acentos, por eso se calcula en Kotlin al guardar.
+     */
+    @ColumnInfo(defaultValue = "") val nombreBusqueda: String = "",
 )
 
 /**

@@ -3,6 +3,8 @@ package com.velok.app.presentation.perfil
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.velok.app.domain.model.RangoTiempo
+import com.velok.app.domain.model.UnidadPeso
+import com.velok.app.domain.usecase.CambiarUnidadPesoUseCase
 import com.velok.app.domain.usecase.CerrarSesionUseCase
 import com.velok.app.domain.usecase.ObtenerComparacionMuscularUseCase
 import com.velok.app.domain.usecase.ObtenerResumenHorasUseCase
@@ -27,6 +29,7 @@ class PerfilViewModel(
     obtenerResumenHoras: ObtenerResumenHorasUseCase,
     obtenerComparacionMuscular: ObtenerComparacionMuscularUseCase,
     private val cerrarSesion: CerrarSesionUseCase,
+    private val cambiarUnidadPeso: CambiarUnidadPesoUseCase,
 ) : ViewModel() {
 
     private val _estado = MutableStateFlow(PerfilUiState())
@@ -46,6 +49,14 @@ class PerfilViewModel(
     }
 
     fun cambiarRango(rango: RangoTiempo) = _estado.update { it.copy(rango = rango) }
+
+    /**
+     * Se guarda en la base de datos; como el usuario se observa, este perfil y las demás pantallas
+     * reciben la nueva unidad al instante.
+     */
+    fun cambiarUnidad(unidad: UnidadPeso) {
+        viewModelScope.launch { cambiarUnidadPeso(unidad) }
+    }
 
     /** Cierra la sesión y avisa a la pantalla cuando terminó, para que navegue al inicio. */
     fun cerrarSesion(alTerminar: () -> Unit) {

@@ -10,6 +10,13 @@ enum class MetricaProgreso {
     VOLUMEN,
     /** Suma de repeticiones. */
     REPETICIONES,
+    ;
+
+    /** Si la métrica es un peso (se calcula en kg y se muestra en la unidad del usuario). */
+    val esPeso: Boolean get() = this == PESO || this == VOLUMEN
+
+    /** Valor calculado (en kg si es peso) en la unidad del usuario. Las repeticiones no cambian. */
+    fun enUnidad(valor: Double, unidad: UnidadPeso): Double = if (esPeso) pesoEnUnidad(valor, unidad) else valor
 }
 
 /** Periodo hacia atrás desde hoy (incluido). */

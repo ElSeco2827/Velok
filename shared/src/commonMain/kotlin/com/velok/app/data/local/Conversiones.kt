@@ -17,6 +17,7 @@ import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.model.TipoSerie
 import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.domain.model.Usuario
+import com.velok.app.domain.model.normalizarBusqueda
 import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
@@ -46,6 +47,7 @@ fun Ejercicio.aEntidad(orden: Int) = EjercicioEntidad(
     repeticionesSugeridas = repeticionesSugeridas,
     imagenUrl = imagenUrl.takeIf { it.esUrlRemota() },
     origen = origen.name,
+    nombreBusqueda = normalizarBusqueda(nombre),
 )
 
 fun EjercicioEntidad.aDominio(): Ejercicio {

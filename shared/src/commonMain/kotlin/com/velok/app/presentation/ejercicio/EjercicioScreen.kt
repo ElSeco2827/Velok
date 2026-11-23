@@ -35,6 +35,7 @@ import com.velok.app.domain.model.Musculo
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.presentation.components.AvisoDiscreto
+import com.velok.app.presentation.components.BuscadorEjercicios
 import com.velok.app.presentation.components.CategoriaCard
 import com.velok.app.presentation.components.ChipEquipo
 import com.velok.app.presentation.components.EjercicioFila
@@ -49,6 +50,7 @@ import org.koin.compose.viewmodel.koinViewModel
 import velok.shared.generated.resources.Res
 import velok.shared.generated.resources.catalogo_sin_conexion
 import velok.shared.generated.resources.sin_ejercicios
+import velok.shared.generated.resources.sin_resultados
 import velok.shared.generated.resources.tab_ejercicio
 import velok.shared.generated.resources.tab_entrenamiento
 
@@ -62,6 +64,7 @@ fun EjercicioScreen(
     EjercicioContenido(
         estado = estado,
         onSeleccionarPestana = viewModel::seleccionarPestana,
+        onBuscar = viewModel::buscar,
         onAlternarEquipo = viewModel::alternarEquipo,
         onAbrirEjercicio = onAbrirEjercicio,
         onAbrirCategoria = onAbrirCategoria,
@@ -73,6 +76,7 @@ fun EjercicioScreen(
 fun EjercicioContenido(
     estado: EjercicioUiState,
     onSeleccionarPestana: (PestanaEjercicio) -> Unit,
+    onBuscar: (String) -> Unit,
     onAlternarEquipo: (TipoEquipo) -> Unit,
     onAbrirEjercicio: (String) -> Unit,
     onAbrirCategoria: (TipoCategoria) -> Unit,
@@ -83,6 +87,11 @@ fun EjercicioContenido(
         PestanasEjercicio(seleccionada = estado.pestana, onSeleccionar = onSeleccionarPestana)
         when (estado.pestana) {
             PestanaEjercicio.EJERCICIO -> {
+                BuscadorEjercicios(
+                    texto = estado.busqueda,
+                    onTexto = onBuscar,
+                    modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 4.dp),
+                )
                 FiltrosEquipo(seleccionado = estado.equipo, onAlternar = onAlternarEquipo)
                 if (estado.sinConexion) {
                     AvisoDiscreto(
@@ -93,7 +102,9 @@ fun EjercicioContenido(
                 when {
                     estado.cargando -> EstadoCargando()
                     estado.error -> EstadoError(onReintentar)
-                    estado.ejercicios.isEmpty() -> EstadoVacio(stringResource(Res.string.sin_ejercicios))
+                    estado.ejercicios.isEmpty() -> EstadoVacio(
+                        stringResource(if (estado.busqueda.isNotBlank()) Res.string.sin_resultados else Res.string.sin_ejercicios),
+                    )
                     else -> ListaEjercicios(estado.ejercicios, onAbrirEjercicio)
                 }
             }
@@ -227,12 +238,14 @@ private fun EjercicioContenidoPreview() {
                 estado = EjercicioUiState(
                     cargando = false,
                     equipo = TipoEquipo.BARRA,
+                    busqueda = "press",
                     ejercicios = listOf(
                         Ejercicio("1", "Press de banca plano (Barra)", TipoCategoria.PECHO, TipoEquipo.BARRA, Musculo.PECHO, emptyList(), ""),
                         Ejercicio("2", "Sentadilla (Barra)", TipoCategoria.PIERNA, TipoEquipo.BARRA, Musculo.CUADRICEPS, emptyList(), ""),
                     ),
                 ),
                 onSeleccionarPestana = {},
+                onBuscar = {},
                 onAlternarEquipo = {},
                 onAbrirEjercicio = {},
                 onAbrirCategoria = {},
@@ -254,6 +267,7 @@ private fun EntrenamientoContenidoPreview() {
                     categorias = TipoCategoria.entries.map { CategoriaEjercicio(it.name, it, "") },
                 ),
                 onSeleccionarPestana = {},
+                onBuscar = {},
                 onAlternarEquipo = {},
                 onAbrirEjercicio = {},
                 onAbrirCategoria = {},

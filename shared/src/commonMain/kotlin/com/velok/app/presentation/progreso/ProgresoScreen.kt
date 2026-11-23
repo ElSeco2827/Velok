@@ -63,6 +63,7 @@ fun ProgresoContenido(
                 explicacion = stringResource(Res.string.resumen_info_general),
                 onMetrica = onMetrica,
                 onRango = onRango,
+                unidad = estado.unidad,
             )
         }
     }

@@ -9,11 +9,15 @@ import com.velok.app.domain.model.cambiarNota
 import com.velok.app.domain.model.cambiarValores
 import com.velok.app.domain.model.eliminarEjercicio
 import com.velok.app.domain.usecase.IniciarSesionUseCase
+import com.velok.app.domain.usecase.ObtenerUnidadPesoUseCase
 import com.velok.app.domain.usecase.TerminarSesionUseCase
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -26,6 +30,7 @@ class SesionViewModel(
     iniciarSesion: IniciarSesionUseCase,
     private val terminarSesion: TerminarSesionUseCase,
     private val clock: Clock,
+    obtenerUnidadPeso: ObtenerUnidadPesoUseCase,
 ) : ViewModel() {
 
     private val _estado = MutableStateFlow(SesionUiState(ahora = clock.now()))
@@ -36,6 +41,10 @@ class SesionViewModel(
             val sesion = iniciarSesion(planId)
             _estado.update { it.copy(cargando = false, sesion = sesion) }
         }
+        obtenerUnidadPeso()
+            .onEach { unidad -> _estado.update { it.copy(unidad = unidad) } }
+            .catch { /* Se queda en kg. */ }
+            .launchIn(viewModelScope)
         viewModelScope.launch {
             while (isActive) {
                 delay(1.seconds)

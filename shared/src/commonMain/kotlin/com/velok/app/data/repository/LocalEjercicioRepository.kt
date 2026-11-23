@@ -3,11 +3,14 @@ package com.velok.app.data.repository
 import com.velok.app.data.local.BaseDatosVelok
 import com.velok.app.data.local.SembradorDatos
 import com.velok.app.data.local.aDominio
+import com.velok.app.data.local.patronLike
 import com.velok.app.data.remote.SincronizadorCatalogo
 import com.velok.app.domain.model.CategoriaEjercicio
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.EstadoCatalogo
+import com.velok.app.domain.model.FiltroCatalogo
 import com.velok.app.domain.model.TipoCategoria
+import com.velok.app.domain.model.normalizarBusqueda
 import com.velok.app.domain.repository.EjercicioRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -39,10 +42,18 @@ class LocalEjercicioRepository(
             CategoriaEjercicio(id = tipo.name.lowercase(), tipo = tipo, imagenUrl = DatosMock.imagen(tipo))
         }
 
-    override fun observarEjercicios(): Flow<List<Ejercicio>> = flow {
+    /** El filtro se aplica en la consulta de SQLite (ver [com.velok.app.data.local.EjercicioDao.buscar]). */
+    override fun observarEjercicios(filtro: FiltroCatalogo): Flow<List<Ejercicio>> = flow {
         sembrador.asegurarDatos()
         sincronizador.iniciarUnaVez(alcance)
-        emitAll(dao.observarCatalogo().map { lista -> lista.map { it.aDominio() } })
+        val consulta = dao.buscar(
+            texto = patronLike(normalizarBusqueda(filtro.texto)),
+            musculos = filtro.musculosTexto.map { it.name },
+            categorias = filtro.categoriasTexto.map { it.name },
+            equipo = filtro.equipo?.name,
+            categoria = filtro.categoria?.name,
+        )
+        emitAll(consulta.map { lista -> lista.map { it.aDominio() } })
     }
 
     override fun observarEstadoCatalogo(): Flow<EstadoCatalogo> = flow {

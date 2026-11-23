@@ -17,12 +17,16 @@ import com.velok.app.domain.usecase.EliminarPlanUseCase
 import com.velok.app.domain.usecase.GuardarPlanUseCase
 import com.velok.app.domain.usecase.ObtenerEjerciciosUseCase
 import com.velok.app.domain.usecase.ObtenerPlanUseCase
+import com.velok.app.domain.usecase.ObtenerUnidadPesoUseCase
+import com.velok.app.presentation.util.buscar
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -37,6 +41,7 @@ class EditarPlanViewModel(
     private val guardarPlan: GuardarPlanUseCase,
     private val eliminarPlan: EliminarPlanUseCase,
     private val obtenerEjercicios: ObtenerEjerciciosUseCase,
+    obtenerUnidadPeso: ObtenerUnidadPesoUseCase,
 ) : ViewModel() {
 
     private val _estado = MutableStateFlow(EditarPlanUiState())
@@ -48,12 +53,19 @@ class EditarPlanViewModel(
             val plan = obtenerPlan(planId).first()
             _estado.update { it.copy(cargando = false, plan = plan) }
         }
-        // El catálogo para "Agregar ejercicio" sí se observa: crece mientras se descarga.
-        obtenerEjercicios()
+        // El catálogo para "Agregar ejercicio" sí se observa: crece mientras se descarga y cambia
+        // con la búsqueda de la hoja (misma espera que en la pestaña Ejercicio).
+        obtenerEjercicios.buscar(texto = _estado.map { it.busqueda }, equipo = flowOf(null))
             .onEach { catalogo -> _estado.update { it.copy(catalogo = catalogo) } }
             .catch { /* Sin catálogo, el selector queda vacío; el plan se puede seguir editando. */ }
             .launchIn(viewModelScope)
+        obtenerUnidadPeso()
+            .onEach { unidad -> _estado.update { it.copy(unidad = unidad) } }
+            .catch { /* Se queda en kg. */ }
+            .launchIn(viewModelScope)
     }
+
+    fun buscar(texto: String) = _estado.update { it.copy(busqueda = texto) }
 
     fun renombrar(nombre: String) = editar { it.renombrar(nombre) }
     fun agregarEjercicio(ejercicio: Ejercicio) = editar { it.agregarEjercicio(ejercicio) }

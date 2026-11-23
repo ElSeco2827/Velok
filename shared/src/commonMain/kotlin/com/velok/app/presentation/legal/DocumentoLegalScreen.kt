@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -38,7 +39,7 @@ enum class DocumentoLegal(val parrafos: StringArrayResource) {
 /**
  * "Términos y condiciones" y "Políticas de privacidad". Es contenido fijo, sin datos ni acciones
  * de negocio, por eso no tiene ViewModel. En el texto, "## " marca una sección, "### " un
- * subtítulo y "• " una viñeta.
+ * subtítulo, "• " una viñeta y "> " una nota destacada (la de proyecto escolar).
  */
 @Composable
 fun DocumentoLegalScreen(
@@ -93,6 +94,17 @@ private fun Parrafo(indice: Int, parrafo: String) {
             style = VelokTheme.tipografia.titleSmall,
             color = colores.sobreFondo,
             modifier = Modifier.padding(top = 12.dp).semantics { heading() },
+        )
+        // Nota destacada (por ejemplo, que es un proyecto escolar).
+        parrafo.startsWith("> ") -> Text(
+            parrafo.removePrefix("> "),
+            style = VelokTheme.tipografia.bodyMedium.copy(fontWeight = FontWeight.SemiBold),
+            color = colores.acento,
+            modifier = Modifier
+                .padding(top = 12.dp)
+                .fillMaxWidth()
+                .background(colores.superficieOscura, VelokTheme.formas.small)
+                .padding(12.dp),
         )
         parrafo.startsWith("• ") -> Text(
             parrafo,

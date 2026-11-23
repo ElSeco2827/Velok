@@ -43,7 +43,9 @@ import com.velok.app.domain.model.SerieSesion
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.model.TipoSerie
+import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.domain.model.iniciarSesion
+import com.velok.app.domain.model.pesoEnUnidad
 import com.velok.app.presentation.components.BotonAgregarSerie
 import com.velok.app.presentation.components.BotonCompletarSerie
 import com.velok.app.presentation.components.CampoNota
@@ -58,9 +60,11 @@ import com.velok.app.presentation.components.InsigniaSerie
 import com.velok.app.presentation.components.OpcionMenu
 import com.velok.app.presentation.components.numerosDeSerie
 import com.velok.app.presentation.theme.VelokTheme
+import com.velok.app.presentation.util.columna
 import com.velok.app.presentation.util.formatearMiles
-import com.velok.app.presentation.util.formatearNumero
+import com.velok.app.presentation.util.formatearPeso
 import com.velok.app.presentation.util.formatoCronometro
+import com.velok.app.presentation.util.sufijo
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
@@ -76,7 +80,6 @@ import velok.shared.generated.resources.duracion
 import velok.shared.generated.resources.borrar_ejercicio
 import velok.shared.generated.resources.ic_cronometro
 import velok.shared.generated.resources.ic_nota
-import velok.shared.generated.resources.kg
 import velok.shared.generated.resources.marcar_serie
 import velok.shared.generated.resources.nota
 import velok.shared.generated.resources.plan_no_encontrado
@@ -92,7 +95,7 @@ import velok.shared.generated.resources.sin_valor
 import velok.shared.generated.resources.terminar_entrenamiento
 import velok.shared.generated.resources.valor_anterior
 import velok.shared.generated.resources.volumen
-import velok.shared.generated.resources.volumen_kg
+import velok.shared.generated.resources.valor_peso
 
 /** "Ejercicio en progreso": cronómetro, volumen, series y tabla por ejercicio para ir marcando. */
 @Composable
@@ -151,7 +154,11 @@ fun SesionContenido(
             else -> Column(Modifier.fillMaxSize()) {
                 ResumenSesion(
                     duracion = sesion.duracion(estado.ahora).formatoCronometro(),
-                    volumen = stringResource(Res.string.volumen_kg, formatearMiles(sesion.volumenKg.roundToLong())),
+                    volumen = stringResource(
+                        Res.string.valor_peso,
+                        formatearMiles(pesoEnUnidad(sesion.volumenKg, estado.unidad).roundToLong()),
+                        stringResource(estado.unidad.sufijo),
+                    ),
                     series = sesion.seriesCompletadas.toString(),
                 )
                 HorizontalDivider(color = colores.superficieOscura)
@@ -163,7 +170,7 @@ fun SesionContenido(
                         val restante = estado.descanso
                             ?.takeIf { it.indiceEjercicio == indice }
                             ?.let { it.hasta - estado.ahora }
-                        EjercicioEnSesion(indice, ej, restante?.inWholeSeconds?.toInt(), acciones)
+                        EjercicioEnSesion(indice, ej, restante?.inWholeSeconds?.toInt(), estado.unidad, acciones)
                     }
                     item(key = "terminar") {
                         Button(
@@ -231,6 +238,7 @@ private fun EjercicioEnSesion(
     indice: Int,
     ej: EjercicioSesion,
     descansoRestanteSegundos: Int?,
+    unidad: UnidadPeso,
     acciones: AccionesSesion,
 ) {
     var mostrarNota by remember(ej.ejercicio.id) { mutableStateOf(ej.nota.isNotEmpty()) }
@@ -267,7 +275,7 @@ private fun EjercicioEnSesion(
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             EtiquetaColumna(stringResource(Res.string.serie), Modifier.width(40.dp))
             EtiquetaColumna(stringResource(Res.string.anterior), Modifier.weight(1.3f))
-            EtiquetaColumna(stringResource(Res.string.kg), Modifier.weight(1f))
+            EtiquetaColumna(stringResource(unidad.columna), Modifier.weight(1f))
             EtiquetaColumna(stringResource(Res.string.reps), Modifier.weight(1f))
             Spacer(Modifier.width(38.dp))
         }
@@ -276,6 +284,7 @@ private fun EjercicioEnSesion(
             FilaSerieSesion(
                 numero = numeros[i],
                 serie = serie,
+                unidad = unidad,
                 onPeso = { acciones.onCambiarPeso(indice, serie.id, it) },
                 onRepeticiones = { acciones.onCambiarRepeticiones(indice, serie.id, it) },
                 onCompletar = { acciones.onAlternarCompletada(indice, serie.id) },
@@ -290,13 +299,15 @@ private fun EjercicioEnSesion(
 private fun FilaSerieSesion(
     numero: Int,
     serie: SerieSesion,
+    unidad: UnidadPeso,
     onPeso: (Double?) -> Unit,
     onRepeticiones: (Int?) -> Unit,
     onCompletar: () -> Unit,
 ) {
     val colores = VelokTheme.colores
+    val sufijo = stringResource(unidad.sufijo)
     val anterior = serie.anterior?.takeIf { it.repeticiones != null }
-        ?.let { stringResource(Res.string.valor_anterior, formatearNumero(it.pesoKg ?: 0.0), it.repeticiones ?: 0) }
+        ?.let { stringResource(Res.string.valor_anterior, formatearPeso(it.pesoKg ?: 0.0, unidad), sufijo, it.repeticiones ?: 0) }
         ?: stringResource(Res.string.sin_valor)
     val etiqueta = if (serie.tipo == TipoSerie.CALENTAMIENTO) stringResource(Res.string.serie_calentamiento) else numero.toString()
 
@@ -311,7 +322,7 @@ private fun FilaSerieSesion(
             textAlign = TextAlign.Center,
             modifier = Modifier.weight(1.3f),
         )
-        CampoPeso(serie.pesoKg, onPeso, Modifier.weight(1f))
+        CampoPeso(serie.pesoKg, unidad, onPeso, Modifier.weight(1f))
         CampoRepeticiones(serie.repeticiones, onRepeticiones, Modifier.weight(1f))
         BotonCompletarSerie(
             completada = serie.completada,
@@ -337,7 +348,12 @@ private fun SesionContenidoPreview() {
     VelokTheme {
         Surface(color = VelokTheme.colores.fondoProfundo) {
             SesionContenido(
-                estado = SesionUiState(cargando = false, sesion = plan.iniciarSesion("s", inicio), ahora = inicio + 12.seconds),
+                estado = SesionUiState(
+                    cargando = false,
+                    sesion = plan.iniciarSesion("s", inicio),
+                    ahora = inicio + 12.seconds,
+                    unidad = UnidadPeso.LB,
+                ),
                 acciones = AccionesSesion(),
             )
         }

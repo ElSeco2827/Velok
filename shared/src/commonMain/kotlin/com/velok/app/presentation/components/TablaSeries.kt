@@ -42,8 +42,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 import com.velok.app.domain.model.TipoSerie
+import com.velok.app.domain.model.UnidadPeso
+import com.velok.app.domain.model.pesoAKg
 import com.velok.app.presentation.theme.VelokTheme
 import com.velok.app.presentation.util.formatearNumero
+import com.velok.app.presentation.util.pesoParaCampo
 import com.velok.app.presentation.util.textoAPeso
 import com.velok.app.presentation.util.textoARepeticiones
 import org.jetbrains.compose.resources.painterResource
@@ -159,16 +162,19 @@ fun InsigniaSerie(
     }
 }
 
-/** Campo oscuro para el peso en kg. Vacío se muestra como "-". */
+/**
+ * Campo oscuro para un peso. Recibe y entrega kg (como se guarda), pero muestra y acepta el valor
+ * en la [unidad] del usuario. Vacío se muestra como "-".
+ */
 @Composable
-fun CampoPeso(valor: Double?, onCambio: (Double?) -> Unit, modifier: Modifier = Modifier) {
+fun CampoPeso(valorKg: Double?, unidad: UnidadPeso, onCambioKg: (Double?) -> Unit, modifier: Modifier = Modifier) {
     CampoNumero(
-        valor = valor,
+        valor = valorKg?.let { pesoParaCampo(it, unidad) },
         formatear = { formatearNumero(it) },
         convertir = ::textoAPeso,
         teclado = KeyboardType.Decimal,
         filtro = { c -> c.isDigit() || c == '.' || c == ',' },
-        onCambio = onCambio,
+        onCambio = { escrito -> onCambioKg(escrito?.let { pesoAKg(it, unidad) }) },
         modifier = modifier,
     )
 }
@@ -333,13 +339,13 @@ private fun TablaSeriesPreview() {
             EncabezadoEjercicio("Sentadilla (Barra)", "", {}, emptyList())
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 InsigniaSerie(1, TipoSerie.NORMAL)
-                CampoPeso(10.0, {}, Modifier.weight(1f))
+                CampoPeso(10.0, UnidadPeso.LB, {}, Modifier.weight(1f))
                 CampoRepeticiones(12, {}, Modifier.weight(1f))
                 BotonCompletarSerie(completada = true, descripcion = "", onClick = {})
             }
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp), verticalAlignment = Alignment.CenterVertically) {
                 InsigniaSerie(0, TipoSerie.CALENTAMIENTO)
-                CampoPeso(null, {}, Modifier.weight(1f))
+                CampoPeso(null, UnidadPeso.KG, {}, Modifier.weight(1f))
                 CampoRepeticiones(10, {}, Modifier.weight(1f))
                 BotonCompletarSerie(completada = false, descripcion = "", onClick = {})
             }

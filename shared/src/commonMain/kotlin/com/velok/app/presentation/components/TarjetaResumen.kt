@@ -30,8 +30,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.velok.app.domain.model.MetricaProgreso
 import com.velok.app.domain.model.RangoTiempo
+import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.presentation.theme.VelokTheme
 import com.velok.app.presentation.util.nombre
+import com.velok.app.presentation.util.textoMetrica
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import velok.shared.generated.resources.Res
@@ -40,10 +42,12 @@ import velok.shared.generated.resources.ic_flecha_abajo
 import velok.shared.generated.resources.ic_info
 import velok.shared.generated.resources.resumen
 import velok.shared.generated.resources.sin_datos_progreso
+import velok.shared.generated.resources.ultima_sesion
 
 /**
  * Tarjeta "Resumen": selector de métrica, selector de periodo y gráfica de línea.
  *
+ * @param valores ya convertidos a [unidad] si la métrica es un peso.
  * @param explicacion texto del botón (i).
  */
 @Composable
@@ -55,6 +59,7 @@ fun TarjetaResumen(
     onMetrica: (MetricaProgreso) -> Unit,
     onRango: (RangoTiempo) -> Unit,
     modifier: Modifier = Modifier,
+    unidad: UnidadPeso = UnidadPeso.KG,
 ) {
     val colores = VelokTheme.colores
     var mostrarInfo by remember { mutableStateOf(false) }
@@ -96,6 +101,15 @@ fun TarjetaResumen(
                     etiqueta = { stringResource(it.nombre) },
                     onSeleccion = onRango,
                     modifier = Modifier.weight(1f),
+                )
+            }
+            // La gráfica no tiene números: el último valor muestra la cifra y la unidad (kg o lb).
+            valores.lastOrNull()?.let { ultimo ->
+                Spacer(Modifier.height(12.dp))
+                Text(
+                    text = stringResource(Res.string.ultima_sesion, textoMetrica(ultimo, metrica, unidad)),
+                    style = VelokTheme.tipografia.bodyMedium,
+                    color = colores.textoSecundario,
                 )
             }
             Spacer(Modifier.height(16.dp))

@@ -3,7 +3,9 @@ package com.velok.app.data.repository
 import com.velok.app.domain.model.CategoriaEjercicio
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.EstadoCatalogo
+import com.velok.app.domain.model.FiltroCatalogo
 import com.velok.app.domain.model.TipoCategoria
+import com.velok.app.domain.model.normalizarBusqueda
 import com.velok.app.domain.repository.EjercicioRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -20,9 +22,18 @@ class MockEjercicioRepository : EjercicioRepository {
         }
     }
 
-    override fun observarEjercicios(): Flow<List<Ejercicio>> = flow {
+    /** En memoria está bien: son solo 21 ejercicios de ejemplo. */
+    override fun observarEjercicios(filtro: FiltroCatalogo): Flow<List<Ejercicio>> = flow {
         delay(RETRASO_SIMULADO_MS)
-        emit(DatosMock.ejercicios)
+        val texto = normalizarBusqueda(filtro.texto)
+        emit(
+            DatosMock.ejercicios.filter { ej ->
+                (filtro.equipo == null || ej.equipo == filtro.equipo) &&
+                    (filtro.categoria == null || ej.categoria == filtro.categoria) &&
+                    (texto.isEmpty() || texto in normalizarBusqueda(ej.nombre) ||
+                        ej.musculoPrimario in filtro.musculosTexto || ej.categoria in filtro.categoriasTexto)
+            },
+        )
     }
 
     override fun observarEstadoCatalogo(): Flow<EstadoCatalogo> = flowOf(EstadoCatalogo.LISTO)
