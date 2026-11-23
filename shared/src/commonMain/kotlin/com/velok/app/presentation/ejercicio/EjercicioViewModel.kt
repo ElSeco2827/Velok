@@ -7,15 +7,13 @@ import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.usecase.ObtenerCategoriasUseCase
 import com.velok.app.domain.usecase.ObtenerEjerciciosUseCase
 import com.velok.app.domain.usecase.ObtenerEstadoCatalogoUseCase
+import com.velok.app.presentation.util.buscar
 import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -26,7 +24,6 @@ import kotlinx.coroutines.launch
  * Catálogo de ejercicios y categorías. Observa el catálogo: cuando termina de descargarse una
  * página de ExerciseDB, la lista se actualiza sola.
  */
-@OptIn(ExperimentalCoroutinesApi::class)
 class EjercicioViewModel(
     private val obtenerCategorias: ObtenerCategoriasUseCase,
     private val obtenerEjercicios: ObtenerEjerciciosUseCase,
@@ -52,6 +49,11 @@ class EjercicioViewModel(
         _estado.update { it.copy(equipo = nuevo) }
     }
 
+    /** El texto se muestra al instante; la consulta espera a que el usuario deje de escribir. */
+    fun buscar(texto: String) {
+        _estado.update { it.copy(busqueda = texto) }
+    }
+
     /** Empieza (o reinicia, desde "Reintentar") la observación del catálogo. */
     fun cargar() {
         observacion?.cancel()
@@ -67,10 +69,9 @@ class EjercicioViewModel(
                     _estado.update { it.copy(cargando = false, error = true) }
                 }
             }
-            // Cada cambio de filtro cambia de consulta; cada cambio en el catálogo vuelve a emitir.
-            _estado.map { it.equipo }
-                .distinctUntilChanged()
-                .flatMapLatest { equipo -> obtenerEjercicios(equipo = equipo) }
+            // Cada cambio de búsqueda (con espera) o de filtro cambia de consulta; cada cambio en el
+            // catálogo vuelve a emitir.
+            obtenerEjercicios.buscar(texto = _estado.map { it.busqueda }, equipo = _estado.map { it.equipo })
                 .onEach { lista -> _estado.update { it.copy(cargando = false, ejercicios = lista) } }
                 .catch { _estado.update { it.copy(cargando = false, error = true) } }
                 .launchIn(this)

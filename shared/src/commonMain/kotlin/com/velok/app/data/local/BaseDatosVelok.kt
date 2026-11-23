@@ -21,6 +21,8 @@ const val NOMBRE_BASE_DATOS = "velok.db"
  * - 2: catálogo de ExerciseDB (columnas imagenUrl y origen en ejercicio, tabla
  *   sincronizacion_catalogo). Migración automática: solo agrega columnas con valor por defecto y
  *   una tabla nueva, así que planes, sesiones y cuentas no se tocan.
+ * - 3: columna nombreBusqueda en ejercicio (búsqueda sin acentos). Migración manual
+ *   ([MIGRACION_2_3]) porque hay que calcularla para los ejercicios ya guardados.
  */
 @Database(
     autoMigrations = [AutoMigration(from = 1, to = 2)],
@@ -36,7 +38,7 @@ const val NOMBRE_BASE_DATOS = "velok.db"
         UsuarioActualEntidad::class,
         SincronizacionCatalogoEntidad::class,
     ],
-    version = 2,
+    version = 3,
 )
 @ConstructedBy(ConstructorBaseDatos::class)
 abstract class BaseDatosVelok : RoomDatabase() {
@@ -61,6 +63,7 @@ expect object ConstructorBaseDatos : RoomDatabaseConstructor<BaseDatosVelok> {
  */
 fun crearBaseDatos(constructor: RoomDatabase.Builder<BaseDatosVelok>): BaseDatosVelok =
     constructor
+        .conMigraciones()
         // SQLite incluido en la app: misma versión en Android e iOS.
         .setDriver(BundledSQLiteDriver())
         // Las consultas nunca corren en el hilo principal.

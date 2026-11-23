@@ -2,6 +2,7 @@ package com.velok.app.presentation.categoria
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.velok.app.domain.model.FiltroCatalogo
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.usecase.ObtenerEjerciciosUseCase
 import kotlinx.coroutines.Job
@@ -31,7 +32,7 @@ class CategoriaViewModel(
     fun cargar() {
         observacion?.cancel()
         _estado.update { it.copy(cargando = true, error = false) }
-        observacion = obtenerEjercicios(categoria = _estado.value.categoria)
+        observacion = obtenerEjercicios(FiltroCatalogo(categoria = _estado.value.categoria))
             .onEach { ejercicios -> _estado.update { it.copy(cargando = false, ejercicios = ejercicios) } }
             .catch { _estado.update { it.copy(cargando = false, error = true) } }
             .launchIn(viewModelScope)

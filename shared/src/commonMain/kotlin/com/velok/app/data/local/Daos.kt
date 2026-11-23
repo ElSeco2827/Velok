@@ -37,6 +37,37 @@ interface EjercicioDao {
     )
     fun observarCatalogo(): Flow<List<EjercicioEntidad>>
 
+    /**
+     * Búsqueda en el catálogo visible (mismas reglas que [observarCatalogo]), hecha en SQLite para
+     * no filtrar en memoria los 1,500 ejercicios.
+     *
+     * @param texto ya normalizado y con `%`, `_` y `\` escapados (ver [patronLike]); vacío = sin
+     *   búsqueda. Coincide con el nombre o, si se pasan, con músculos y categorías en español.
+     * @param equipo nombre de un TipoEquipo, o null para cualquiera.
+     * @param categoria nombre de un TipoCategoria, o null para cualquiera.
+     */
+    @Query(
+        """
+        SELECT * FROM ejercicio
+        WHERE origen = CASE WHEN EXISTS (SELECT 1 FROM ejercicio WHERE origen = 'EXERCISEDB')
+                            THEN 'EXERCISEDB' ELSE 'EJEMPLO' END
+          AND (:equipo IS NULL OR equipo = :equipo)
+          AND (:categoria IS NULL OR categoria = :categoria)
+          AND (:texto = ''
+               OR nombreBusqueda LIKE '%' || :texto || '%' ESCAPE '\'
+               OR musculoPrimario IN (:musculos)
+               OR categoria IN (:categorias))
+        ORDER BY orden, nombre COLLATE NOCASE
+        """,
+    )
+    fun buscar(
+        texto: String,
+        musculos: List<String>,
+        categorias: List<String>,
+        equipo: String?,
+        categoria: String?,
+    ): Flow<List<EjercicioEntidad>>
+
     @Query("SELECT COUNT(*) FROM ejercicio WHERE origen = 'EXERCISEDB'")
     fun observarCantidadDescargados(): Flow<Int>
 
@@ -47,6 +78,13 @@ interface EjercicioDao {
     @Upsert
     suspend fun guardar(ejercicios: List<EjercicioEntidad>)
 }
+
+/**
+ * Prepara un texto ya normalizado para `LIKE ... ESCAPE '\'`: lo que escribe el usuario se busca
+ * literal ("100%" no debe funcionar como comodín).
+ */
+fun patronLike(texto: String): String =
+    texto.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
 
 @Dao
 interface SincronizacionDao {
