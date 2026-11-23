@@ -37,6 +37,7 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.ui.text.style.TextAlign
 import com.velok.app.domain.model.Ejercicio
 import com.velok.app.domain.model.EjercicioPlan
 import com.velok.app.domain.model.Musculo
@@ -45,8 +46,10 @@ import com.velok.app.domain.model.Serie
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoEquipo
 import com.velok.app.domain.model.TipoSerie
+import com.velok.app.domain.model.UnidadPeso
 import com.velok.app.presentation.components.BotonAgregarSerie
 import com.velok.app.presentation.components.BotonOscuroAncho
+import com.velok.app.presentation.components.BuscadorEjercicios
 import com.velok.app.presentation.components.CampoNota
 import com.velok.app.presentation.components.CampoPeso
 import com.velok.app.presentation.components.CampoRepeticiones
@@ -60,6 +63,7 @@ import com.velok.app.presentation.components.InsigniaSerie
 import com.velok.app.presentation.components.OpcionMenu
 import com.velok.app.presentation.components.numerosDeSerie
 import com.velok.app.presentation.theme.VelokTheme
+import com.velok.app.presentation.util.columna
 import com.velok.app.presentation.util.formatoCronometro
 import com.velok.app.presentation.util.resumenSeries
 import kotlinx.datetime.LocalDate
@@ -80,7 +84,6 @@ import velok.shared.generated.resources.descanso
 import velok.shared.generated.resources.elegir_ejercicio
 import velok.shared.generated.resources.ic_cronometro
 import velok.shared.generated.resources.ic_nota
-import velok.shared.generated.resources.kg
 import velok.shared.generated.resources.nombre_plan
 import velok.shared.generated.resources.nota
 import velok.shared.generated.resources.plan_no_encontrado
@@ -88,6 +91,7 @@ import velok.shared.generated.resources.plan_sin_nombre
 import velok.shared.generated.resources.reiniciar_ejercicio
 import velok.shared.generated.resources.reps
 import velok.shared.generated.resources.serie
+import velok.shared.generated.resources.sin_resultados
 import velok.shared.generated.resources.serie_calentamiento
 
 /** Opciones del selector de descanso, en segundos. */
@@ -117,6 +121,7 @@ fun EditarPlanScreen(
             onCambiarNota = viewModel::cambiarNota,
             onAbrirEjercicio = onAbrirEjercicio,
             onBorrarPlan = { viewModel.borrarPlan(onBorrado = onPlanBorrado) },
+            onBuscar = viewModel::buscar,
         ),
     )
 }
@@ -135,6 +140,8 @@ class AccionesEditarPlan(
     val onCambiarNota: (Int, String) -> Unit = { _, _ -> },
     val onAbrirEjercicio: (String) -> Unit = {},
     val onBorrarPlan: () -> Unit = {},
+    /** Texto del buscador de la hoja "Agregar ejercicio". */
+    val onBuscar: (String) -> Unit = {},
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -159,7 +166,7 @@ fun EditarPlanContenido(
             ) {
                 item(key = "nombre") { CampoNombrePlan(plan.nombre, acciones.onRenombrar) }
                 itemsIndexed(plan.ejercicios, key = { i, ep -> "$i-${ep.ejercicio.id}" }) { indice, ep ->
-                    EjercicioEditable(indice, ep, acciones, onBorrarRutina = { confirmarBorrado = true })
+                    EjercicioEditable(indice, ep, estado.unidad, acciones, onBorrarRutina = { confirmarBorrado = true })
                 }
                 item(key = "agregar") {
                     BotonOscuroAncho(
@@ -192,6 +199,20 @@ fun EditarPlanContenido(
                 color = colores.sobreFondo,
                 modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             )
+            BuscadorEjercicios(
+                texto = estado.busqueda,
+                onTexto = acciones.onBuscar,
+                modifier = Modifier.padding(horizontal = 16.dp),
+            )
+            if (estado.catalogo.isEmpty() && estado.busqueda.isNotBlank()) {
+                Text(
+                    text = stringResource(Res.string.sin_resultados),
+                    style = VelokTheme.tipografia.bodyMedium,
+                    color = colores.sobreFondoSecundario,
+                    modifier = Modifier.fillMaxWidth().padding(24.dp),
+                    textAlign = TextAlign.Center,
+                )
+            }
             LazyColumn(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp),
@@ -262,6 +283,7 @@ private fun CampoNombrePlan(nombre: String, onCambio: (String) -> Unit) {
 private fun EjercicioEditable(
     indice: Int,
     ep: EjercicioPlan,
+    unidad: UnidadPeso,
     acciones: AccionesEditarPlan,
     onBorrarRutina: () -> Unit,
 ) {
@@ -316,7 +338,7 @@ private fun EjercicioEditable(
 
         Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             EtiquetaColumna(stringResource(Res.string.serie), Modifier.width(40.dp))
-            EtiquetaColumna(stringResource(Res.string.kg), Modifier.weight(1f))
+            EtiquetaColumna(stringResource(unidad.columna), Modifier.weight(1f))
             EtiquetaColumna(stringResource(Res.string.reps), Modifier.weight(1f))
         }
         val numeros = numerosDeSerie(ep.series.map { it.tipo })
@@ -324,6 +346,7 @@ private fun EjercicioEditable(
             FilaSerieEditable(
                 numero = numeros[i],
                 serie = serie,
+                unidad = unidad,
                 onAlternarTipo = { acciones.onAlternarTipoSerie(indice, serie.id) },
                 onPeso = { acciones.onCambiarPeso(indice, serie.id, it) },
                 onRepeticiones = { acciones.onCambiarRepeticiones(indice, serie.id, it) },
@@ -338,6 +361,7 @@ private fun EjercicioEditable(
 private fun FilaSerieEditable(
     numero: Int,
     serie: Serie,
+    unidad: UnidadPeso,
     onAlternarTipo: () -> Unit,
     onPeso: (Double?) -> Unit,
     onRepeticiones: (Int?) -> Unit,
@@ -352,7 +376,7 @@ private fun FilaSerieEditable(
                 descripcion = stringResource(Res.string.cambiar_tipo_serie, etiqueta),
             )
         }
-        CampoPeso(serie.pesoKg, onPeso, Modifier.weight(1f))
+        CampoPeso(serie.pesoKg, unidad, onPeso, Modifier.weight(1f))
         CampoRepeticiones(serie.repeticiones, onRepeticiones, Modifier.weight(1f))
     }
 }
@@ -372,6 +396,7 @@ private fun EditarPlanContenidoPreview() {
                 estado = EditarPlanUiState(
                     cargando = false,
                     plan = Plan("p", "Set del Miércoles", TipoCategoria.PIERNA, "", LocalDate(2026, 10, 16), listOf(EjercicioPlan(sentadilla, series))),
+                    unidad = UnidadPeso.LB,
                 ),
                 acciones = AccionesEditarPlan(),
             )

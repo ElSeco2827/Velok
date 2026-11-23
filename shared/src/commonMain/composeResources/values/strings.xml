@@ -91,6 +91,9 @@
     <string name="borrar">Borrar</string>
     <string name="cancelar">Cancelar</string>
 
+    <!-- Unidad de peso (Perfil) -->
+    <string name="unidad_peso">Unidad de peso</string>
+
     <!-- Cerrar sesión (Perfil) -->
     <string name="cerrar_sesion">Cerrar sesión</string>
     <string name="cerrar_sesion_titulo">¿Cerrar sesión?</string>
@@ -101,9 +104,11 @@
     <string name="serie">SERIE</string>
     <string name="anterior">ANTERIOR</string>
     <string name="kg">KG</string>
+    <string name="lb">LB</string>
     <string name="reps">REPS</string>
     <string name="serie_calentamiento">W</string>
-    <string name="valor_anterior">%1$skg x %2$d</string>
+    <!-- %1$s peso, %2$s unidad (kg o lb), %3$d repeticiones: "50kg x 10" -->
+    <string name="valor_anterior">%1$s%2$s x %3$d</string>
     <string name="sin_valor">-</string>
     <string name="descanso">Descanso: %1$s</string>
     <string name="nota">Nota</string>
@@ -116,7 +121,11 @@
     <string name="duracion">Duración</string>
     <string name="volumen">Volumen</string>
     <string name="series">Series</string>
-    <string name="volumen_kg">%1$s kg</string>
+    <!-- Peso o volumen con su unidad: %1$s valor, %2$s unidad (kg o lb) -->
+    <string name="valor_peso">%1$s %2$s</string>
+    <string name="valor_repeticiones">%1$s reps</string>
+    <!-- Tarjeta Resumen: valor de la sesión más reciente con su unidad ("135 lb") -->
+    <string name="ultima_sesion">Última sesión: %1$s</string>
     <string name="terminar_entrenamiento">Terminar entrenamiento</string>
     <string name="salir_sin_guardar_titulo">¿Salir sin guardar?</string>
     <string name="salir_sin_guardar_mensaje">No completaste ninguna serie, así que este entrenamiento no se guardará.</string>
@@ -134,6 +143,9 @@
     <string name="ejercicio_series">%1$d × %2$d series</string>
     <string name="sin_ejercicios">No hay ejercicios con este filtro</string>
     <string name="catalogo_sin_conexion">Sin conexión: se muestran ejercicios de ejemplo</string>
+    <string name="buscar_ejercicio">Buscar ejercicio (en inglés) o músculo</string>
+    <string name="limpiar_busqueda">Borrar búsqueda</string>
+    <string name="sin_resultados">Sin resultados</string>
     <string name="atribucion_exercisedb">Datos e imágenes: ExerciseDB</string>
     <string name="ejercicio_no_encontrado">No se encontró el ejercicio</string>
     <string name="primario">Primario: %1$s</string>
@@ -256,47 +268,92 @@
     <string name="ejemplo_peso_kg">70</string>
     <string name="ejemplo_peso_lb">155</string>
 
-    <!-- Documentos legales: "## " = sección, "### " = subtítulo, "• " = viñeta -->
+    <!--
+      Documentos legales: "## " = sección, "### " = subtítulo, "• " = viñeta, "> " = nota destacada.
+      Los datos del equipo responsable (nombres, correo, domicilio, fecha, plazos y jurisdicción)
+      los proporcionó el equipo; no se inventan ni se cambian sin su indicación.
+    -->
     <string-array name="documento_terminos">
         <item>Términos y condiciones de uso</item>
-        <item>Velok · Última actualización: [FECHA]</item>
+        <item>Velok · Última actualización: 22 de noviembre de 2026</item>
+        <item>> Proyecto escolar: Velok es un proyecto académico en desarrollo. No es un servicio comercial y no se ofrece con las garantías de un producto terminado.</item>
         <item>## 1. Aceptación de los términos</item>
         <item>Al crear una cuenta o usar Velok (la “App”), aceptas estos Términos y condiciones y nuestra Política de privacidad. Si no estás de acuerdo con ellos, no debes usar la App.</item>
-        <item>La App es operada por [NOMBRE O RAZÓN SOCIAL DEL RESPONSABLE], con domicilio en [DOMICILIO COMPLETO] (“nosotros”).</item>
+        <item>La App es desarrollada, como proyecto escolar, por el siguiente equipo de estudiantes del Instituto Tecnológico de Jiquilpan (TecNM) (“nosotros”):</item>
+        <item>• Bryan Gael Esquivel Pérez</item>
+        <item>• Sergio Octavio Cervantes Mujica</item>
+        <item>• Daniel Gómez Villaseñor</item>
+        <item>Domicilio: Instituto Tecnológico de Jiquilpan, Carretera Nacional s/n Km. 202, C.P. 59510, Jiquilpan, Michoacán, México.</item>
         <item>## 2. Qué es la App</item>
-        <item>Velok es una aplicación para registrar y dar seguimiento a tus rutinas de gimnasio. Te permite consultar los ejercicios de tu rutina, medir la duración de tus sesiones, registrar el peso que levantas y ver tu progreso.</item>
+        <item>Velok es una aplicación para registrar y dar seguimiento a tus rutinas de gimnasio. Te permite crear planes de entrenamiento, consultar un catálogo de ejercicios, registrar las series, repeticiones y peso de cada sesión, medir su duración y ver tu progreso.</item>
+        <item>La pantalla de actividad diaria (pasos, calorías, distancia y ritmo cardiaco) muestra por ahora datos de ejemplo: la App todavía no lee sensores ni datos de salud de tu dispositivo.</item>
         <item>Podemos agregar, modificar o retirar funciones en cualquier momento.</item>
         <item>## 3. Requisitos para usar la App</item>
-        <item>• Debes tener al menos [18] años.</item>
+        <item>• Debes tener al menos 18 años.</item>
         <item>• Debes proporcionar información veraz y mantenerla actualizada.</item>
         <item>• Solo puedes tener una cuenta personal. No está permitido crear cuentas a nombre de otra persona.</item>
         <item>## 4. Tu cuenta y su seguridad</item>
-        <item>Eres responsable de mantener la confidencialidad de tu contraseña y de toda la actividad que ocurra en tu cuenta. Si sospechas que alguien accedió sin tu autorización, avísanos de inmediato en [CORREO DE CONTACTO].</item>
-        <item>Si inicias sesión con Google, también estás sujeto a los términos de Google respecto de esa cuenta.</item>
-        <item>## 5. Aviso importante sobre salud y ejercicio</item>
-        <item>La App ofrece información y herramientas de seguimiento con fines informativos y de organización. No es un servicio médico, ni sustituye el consejo de un médico, entrenador o nutriólogo.</item>
+        <item>Tu cuenta, tus planes y tu historial se guardan únicamente en tu dispositivo. Eres responsable de proteger el acceso a tu dispositivo y de mantener la confidencialidad de tu contraseña.</item>
+        <item>En esta versión, el botón “Iniciar sesión con Google” es una simulación: no se conecta con Google ni recibe datos de tu cuenta de Google.</item>
+        <item>Si sospechas un uso indebido de tu cuenta, escríbenos a bgep7u7@icloud.com.</item>
+        <item>## 5. Catálogo de ejercicios (ExerciseDB)</item>
+        <item>El catálogo de ejercicios y sus imágenes provienen de ExerciseDB (servicio gratuito de AscendAPI). Sus nombres se muestran en inglés, tal como los publica esa fuente. Ese contenido pertenece a sus respectivos titulares y se usa solo para mostrarlo dentro de la App.</item>
+        <item>No garantizamos que el catálogo esté completo, actualizado o libre de errores, ni que el servicio de ExerciseDB esté siempre disponible. Sin conexión, la App usa la última copia guardada en tu dispositivo.</item>
+        <item>## 6. Aviso importante sobre salud y ejercicio</item>
+        <item>La App ofrece herramientas de seguimiento con fines informativos y de organización. No es un servicio médico, ni sustituye el consejo de un médico, entrenador o nutriólogo. Consulta a un profesional antes de empezar o cambiar una rutina de ejercicio y detente si sientes dolor o malestar.</item>
+        <item>## 7. Limitación de responsabilidad</item>
+        <item>La App se ofrece “tal cual” y “según disponibilidad”, como parte de un proyecto escolar. En la medida en que lo permita la ley aplicable, no somos responsables de lesiones derivadas de la realización de ejercicios, de decisiones tomadas con base en la información de la App, ni de la pérdida de datos guardados en tu dispositivo (por ejemplo, si desinstalas la App o borras sus datos).</item>
+        <item>## 8. Cambios a estos términos</item>
+        <item>Podemos actualizar estos Términos y condiciones. Publicaremos la nueva versión en la App con su fecha de actualización. Si sigues usando la App después de un cambio, se entiende que aceptas la nueva versión.</item>
+        <item>## 9. Ley aplicable y jurisdicción</item>
+        <item>Estos Términos y condiciones se rigen por las leyes de los Estados Unidos Mexicanos. Cualquier controversia se someterá a los tribunales competentes de Jiquilpan, Michoacán.</item>
+        <item>## 10. Contacto</item>
+        <item>Para cualquier duda sobre estos Términos y condiciones, escríbenos a bgep7u7@icloud.com.</item>
     </string-array>
     <string-array name="documento_privacidad">
         <item>Política de privacidad (Aviso de privacidad)</item>
-        <item>Velok · Última actualización: [FECHA]</item>
+        <item>Velok · Última actualización: 22 de noviembre de 2026</item>
+        <item>> Proyecto escolar: Velok es un proyecto académico en desarrollo, no un servicio comercial. Tus datos se guardan solo en tu dispositivo y no se envían a ningún servidor nuestro.</item>
         <item>## 1. Quién es el responsable de tus datos</item>
-        <item>[NOMBRE O RAZÓN SOCIAL DEL RESPONSABLE], con domicilio en [DOMICILIO COMPLETO], es el responsable del tratamiento de tus datos personales conforme a la legislación mexicana aplicable en materia de protección de datos personales.</item>
-        <item>Puedes contactarnos en: [CORREO DE CONTACTO PARA PRIVACIDAD].</item>
-        <item>## 2. Qué datos personales recabamos</item>
-        <item>Recabamos los siguientes datos, según cómo uses la app:</item>
+        <item>Los responsables del tratamiento de tus datos personales, conforme a la Ley Federal de Protección de Datos Personales en Posesión de los Particulares, son los estudiantes del Instituto Tecnológico de Jiquilpan (TecNM) que forman el equipo desarrollador de Velok, proyecto escolar:</item>
+        <item>• Bryan Gael Esquivel Pérez</item>
+        <item>• Sergio Octavio Cervantes Mujica</item>
+        <item>• Daniel Gómez Villaseñor</item>
+        <item>Domicilio: Instituto Tecnológico de Jiquilpan, Carretera Nacional s/n Km. 202, C.P. 59510, Jiquilpan, Michoacán, México.</item>
+        <item>Puedes contactarnos en: bgep7u7@icloud.com.</item>
+        <item>## 2. Qué datos personales se recaban</item>
+        <item>La App solo recaba los datos que tú escribes en ella:</item>
         <item>### Datos de cuenta</item>
         <item>• Nombre</item>
         <item>• Correo electrónico</item>
-        <item>• Contraseña (se almacena cifrada; nunca la vemos en texto legible)</item>
-        <item>• Si usas Google para iniciar sesión: nombre, correo y foto de perfil que Google nos comparte con tu autorización</item>
-        <item>• Confirmación de que eres mayor de edad [o fecha de nacimiento]</item>
-        <item>### Datos de perfil y entrenamiento</item>
-        <item>• Unidades de medida preferidas</item>
-        <item>• Objetivo de entrenamiento, nivel de experiencia, días y duración disponibles, y equipo o lugar de entrenamiento</item>
-        <item>• Peso corporal [y estatura, sexo, peso deseado], solo si decides proporcionarlos</item>
-        <item>### Datos de uso de la app</item>
-        <item>• Rutinas, ejercicios realizados, series, repeticiones y peso levantado</item>
-        <item>• Duración de tus sesiones y calorías estimadas</item>
-        <item>• Historial y progreso</item>
+        <item>• Contraseña: no se guarda tal cual, sino un hash (PBKDF2-HMAC-SHA256 con un valor aleatorio único por contraseña), del que no se puede obtener la contraseña original.</item>
+        <item>### Datos del cuestionario inicial</item>
+        <item>• Fecha de nacimiento (para confirmar que tienes al menos 18 años)</item>
+        <item>• Unidad de peso preferida (kg o lb)</item>
+        <item>• Estatura y peso corporal</item>
+        <item>• Meta de entrenamiento</item>
+        <item>### Datos de entrenamiento</item>
+        <item>• Planes, ejercicios, series, repeticiones y peso levantado</item>
+        <item>• Fecha y duración de tus sesiones, e historial de progreso</item>
+        <item>La App no recaba tu ubicación, contactos, fotos ni datos de salud de tu dispositivo. El inicio de sesión con Google de esta versión es una simulación y no recibe datos de Google.</item>
+        <item>## 3. Para qué se usan tus datos</item>
+        <item>• Crear tu cuenta y permitirte iniciar y cerrar sesión.</item>
+        <item>• Guardar tus planes y entrenamientos y mostrarte tu progreso.</item>
+        <item>• Mostrar los pesos en la unidad que elegiste.</item>
+        <item>No usamos tus datos para publicidad, no los vendemos y no los compartimos con terceros.</item>
+        <item>## 4. Dónde se guardan tus datos</item>
+        <item>Todos tus datos se guardan únicamente en una base de datos local dentro de tu dispositivo. La App no tiene servidores propios y no envía tus datos personales a ningún servidor.</item>
+        <item>Cerrar sesión no borra tus datos del dispositivo. Para eliminarlos por completo, borra los datos de la App desde los ajustes de tu dispositivo o desinstálala.</item>
+        <item>## 5. Catálogo de ejercicios (ExerciseDB)</item>
+        <item>Para mostrar el catálogo, la App descarga la lista de ejercicios y sus imágenes desde ExerciseDB (servicio gratuito de AscendAPI), fuente de los datos e imágenes del catálogo. Esas solicitudes no incluyen tus datos personales. Como en cualquier conexión a internet, ese servicio puede recibir datos técnicos de la conexión, como tu dirección IP; su tratamiento se rige por las políticas de AscendAPI.</item>
+        <item>## 6. Tus derechos (ARCO)</item>
+        <item>Tienes derecho a acceder a tus datos, rectificarlos, cancelarlos u oponerte a su tratamiento (derechos ARCO), así como a revocar tu consentimiento.</item>
+        <item>• Acceso y rectificación: puedes ver y cambiar tus datos de entrenamiento y tu unidad de peso dentro de la App.</item>
+        <item>• Cancelación: puedes eliminar tus datos borrando los datos de la App o desinstalándola.</item>
+        <item>• Para cualquier otra solicitud, escribe a bgep7u7@icloud.com indicando tu nombre y lo que solicitas. Responderemos en un plazo de 20 días hábiles contados a partir de la recepción de tu solicitud.</item>
+        <item>## 7. Cambios a este aviso</item>
+        <item>Podemos actualizar este aviso de privacidad. Publicaremos la nueva versión en la App con su fecha de actualización y, si el cambio es importante, te lo avisaremos dentro de la App.</item>
+        <item>## 8. Contacto</item>
+        <item>Para dudas sobre este aviso o sobre el tratamiento de tus datos, escribe a bgep7u7@icloud.com.</item>
     </string-array>
 </resources>

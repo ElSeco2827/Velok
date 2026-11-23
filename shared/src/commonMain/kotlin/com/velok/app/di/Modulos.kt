@@ -18,6 +18,7 @@ import com.velok.app.domain.repository.EjercicioRepository
 import com.velok.app.domain.repository.PlanRepository
 import com.velok.app.domain.repository.SesionRepository
 import com.velok.app.domain.repository.UsuarioRepository
+import com.velok.app.domain.usecase.CambiarUnidadPesoUseCase
 import com.velok.app.domain.usecase.CerrarSesionUseCase
 import com.velok.app.domain.usecase.CrearPlanUseCase
 import com.velok.app.domain.usecase.EliminarPlanUseCase
@@ -38,6 +39,7 @@ import com.velok.app.domain.usecase.ObtenerPlanUseCase
 import com.velok.app.domain.usecase.ObtenerPlanesUseCase
 import com.velok.app.domain.usecase.ObtenerProgresoUseCase
 import com.velok.app.domain.usecase.ObtenerResumenHorasUseCase
+import com.velok.app.domain.usecase.ObtenerUnidadPesoUseCase
 import com.velok.app.domain.usecase.ObtenerUsuarioUseCase
 import com.velok.app.domain.usecase.RegistrarCuentaUseCase
 import com.velok.app.domain.usecase.RestablecerContrasenaUseCase
@@ -120,6 +122,8 @@ val domainModule = module {
     factory { RegistrarCuentaUseCase(get()) }
     factory { RestablecerContrasenaUseCase(get()) }
     factory { CerrarSesionUseCase(get()) }
+    factory { ObtenerUnidadPesoUseCase(get()) }
+    factory { CambiarUnidadPesoUseCase(get()) }
     factory { GuardarPerfilFisicoUseCase(get(), get()) }
 }
 
@@ -138,9 +142,9 @@ val presentationModule = module {
     // Pantallas de detalle: reciben el id de la ruta como parámetro (parametersOf en la pantalla).
     viewModel { params -> CategoriaViewModel(params.get(), get()) }
     viewModel { params -> DetallePlanViewModel(params.get(), get()) }
-    viewModel { params -> EditarPlanViewModel(params.get(), get(), get(), get(), get()) }
-    viewModel { params -> SesionViewModel(params.get(), get(), get(), get()) }
-    viewModel { params -> DetalleEjercicioViewModel(params.get(), get(), get()) }
+    viewModel { params -> EditarPlanViewModel(params.get(), get(), get(), get(), get(), get()) }
+    viewModel { params -> SesionViewModel(params.get(), get(), get(), get(), get()) }
+    viewModel { params -> DetalleEjercicioViewModel(params.get(), get(), get(), get()) }
 }
 
 val velokModules = listOf(moduloPlataforma(), dataModule, domainModule, presentationModule)

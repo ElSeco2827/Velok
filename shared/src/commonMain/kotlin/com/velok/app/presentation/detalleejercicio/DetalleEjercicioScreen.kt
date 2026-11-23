@@ -118,6 +118,7 @@ fun DetalleEjercicioContenido(
                         explicacion = stringResource(Res.string.resumen_info_ejercicio),
                         onMetrica = onMetrica,
                         onRango = onRango,
+                        unidad = estado.unidad,
                     )
                 }
             }
