@@ -11,8 +11,7 @@ import com.velok.app.data.repository.LocalCuentaRepository
 import com.velok.app.data.repository.LocalEjercicioRepository
 import com.velok.app.data.repository.LocalPlanRepository
 import com.velok.app.data.repository.LocalSesionRepository
-import com.velok.app.data.repository.MockActividadRepository
-import com.velok.app.domain.repository.ActividadRepository
+import com.velok.app.data.salud.moduloSalud
 import com.velok.app.domain.repository.AuthRepository
 import com.velok.app.domain.repository.EjercicioRepository
 import com.velok.app.domain.repository.PlanRepository
@@ -27,14 +26,13 @@ import com.velok.app.domain.usecase.GuardarPlanUseCase
 import com.velok.app.domain.usecase.IngresarConCorreoUseCase
 import com.velok.app.domain.usecase.IngresarConGoogleUseCase
 import com.velok.app.domain.usecase.IniciarSesionUseCase
-import com.velok.app.domain.usecase.ObtenerActividadDiariaUseCase
+import com.velok.app.domain.usecase.ObtenerActividadSaludUseCase
 import com.velok.app.domain.usecase.ObtenerCategoriasUseCase
 import com.velok.app.domain.usecase.ObtenerComparacionMuscularUseCase
 import com.velok.app.domain.usecase.ObtenerDestinoInicialUseCase
 import com.velok.app.domain.usecase.ObtenerEjercicioUseCase
 import com.velok.app.domain.usecase.ObtenerEjerciciosUseCase
 import com.velok.app.domain.usecase.ObtenerEstadoCatalogoUseCase
-import com.velok.app.domain.usecase.ObtenerMetricasUseCase
 import com.velok.app.domain.usecase.ObtenerPlanUseCase
 import com.velok.app.domain.usecase.ObtenerPlanesUseCase
 import com.velok.app.domain.usecase.ObtenerProgresoUseCase
@@ -86,8 +84,7 @@ val dataModule = module {
     single { crearClienteHttp() }
     single { ClienteExerciseDb(get()) }
     single { SincronizadorCatalogo(get(), get(), get(), get()) }
-    // Actividad diaria: sigue siendo mock hasta integrar Health Connect / HealthKit.
-    single<ActividadRepository> { MockActividadRepository() }
+    // Actividad diaria (Health Connect / HealthKit): la registra moduloSalud() de cada plataforma.
     single<EjercicioRepository> { LocalEjercicioRepository(get(), get(), get(), get(ALCANCE_APP)) }
     single<PlanRepository> { LocalPlanRepository(get(), get()) }
     single<SesionRepository> { LocalSesionRepository(get(), get()) }
@@ -99,8 +96,7 @@ val dataModule = module {
 
 val domainModule = module {
     single<Clock> { Clock.System }
-    factory { ObtenerActividadDiariaUseCase(get(), get()) }
-    factory { ObtenerMetricasUseCase(get(), get()) }
+    factory { ObtenerActividadSaludUseCase(get(), get()) }
     factory { ObtenerCategoriasUseCase(get()) }
     factory { ObtenerEjerciciosUseCase(get()) }
     factory { ObtenerEstadoCatalogoUseCase(get()) }
@@ -147,4 +143,4 @@ val presentationModule = module {
     viewModel { params -> DetalleEjercicioViewModel(params.get(), get(), get(), get()) }
 }
 
-val velokModules = listOf(moduloPlataforma(), dataModule, domainModule, presentationModule)
+val velokModules = listOf(moduloPlataforma(), moduloSalud(), dataModule, domainModule, presentationModule)

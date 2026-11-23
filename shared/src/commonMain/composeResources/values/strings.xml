@@ -66,6 +66,21 @@
     <string name="valor_pasos">%1$s</string>
     <string name="valor_distancia">%1$s km</string>
     <string name="valor_ritmo_cardiaco">%1$s lpm</string>
+    <!-- Métrica sin datos del día: nunca se muestra un 0 que parezca una medición real -->
+    <string name="sin_dato">--</string>
+    <string name="sin_datos_salud">sin datos</string>
+
+    <!-- Datos de salud (Health Connect / HealthKit) -->
+    <string name="pasos_de_meta">%1$s de %2$s pasos</string>
+    <string name="salud_conectar_mensaje">Conecta tus datos de salud para ver tus pasos, distancia, calorías activas y ritmo cardiaco de hoy. Velok solo los lee y los muestra en este dispositivo.</string>
+    <string name="salud_conectar">Conectar datos de salud</string>
+    <string name="salud_rechazado">Velok no tiene permiso para leer tus datos de salud. La app sigue funcionando sin ellos; puedes darlo cuando quieras.</string>
+    <string name="salud_abrir_ajustes">Abrir ajustes de Health Connect</string>
+    <string name="salud_intentar_de_nuevo">Intentar de nuevo</string>
+    <string name="salud_no_disponible">Los datos de salud no están disponibles en este dispositivo. El resto de la app funciona normalmente.</string>
+    <string name="salud_instalar">Para ver tus datos de actividad necesitas instalar o actualizar la app Health Connect.</string>
+    <string name="salud_abrir_tienda">Abrir Play Store</string>
+    <string name="salud_error">No se pudieron leer tus datos de salud.</string>
 
     <!-- Planes -->
     <string name="lista_planes">Lista de planes</string>
@@ -286,7 +301,7 @@
         <item>Domicilio: Instituto Tecnológico de Jiquilpan, Carretera Nacional s/n Km. 202, C.P. 59510, Jiquilpan, Michoacán, México.</item>
         <item>## 2. Qué es la App</item>
         <item>Velok es una aplicación para registrar y dar seguimiento a tus rutinas de gimnasio. Te permite crear planes de entrenamiento, consultar un catálogo de ejercicios, registrar las series, repeticiones y peso de cada sesión, medir su duración y ver tu progreso.</item>
-        <item>La pantalla de actividad diaria (pasos, calorías, distancia y ritmo cardiaco) muestra por ahora datos de ejemplo: la App todavía no lee sensores ni datos de salud de tu dispositivo.</item>
+        <item>Si das permiso, la tarjeta de actividad diaria muestra tus pasos, distancia, calorías activas y ritmo cardiaco del día, leídos de Health Connect (Android) o HealthKit (iPhone). El anillo de progreso compara tus pasos con una meta de 8,000 pasos, un valor de referencia y no una recomendación médica. Sin permiso, la App funciona sin esos datos.</item>
         <item>Podemos agregar, modificar o retirar funciones en cualquier momento.</item>
         <item>## 3. Requisitos para usar la App</item>
         <item>• Debes tener al menos 18 años.</item>
@@ -322,7 +337,7 @@
         <item>Domicilio: Instituto Tecnológico de Jiquilpan, Carretera Nacional s/n Km. 202, C.P. 59510, Jiquilpan, Michoacán, México.</item>
         <item>Puedes contactarnos en: bgep7u7@icloud.com.</item>
         <item>## 2. Qué datos personales se recaban</item>
-        <item>La App solo recaba los datos que tú escribes en ella:</item>
+        <item>La App recaba los datos que tú escribes en ella y, solo si das permiso, lee algunos datos de actividad de tu teléfono:</item>
         <item>### Datos de cuenta</item>
         <item>• Nombre</item>
         <item>• Correo electrónico</item>
@@ -335,25 +350,33 @@
         <item>### Datos de entrenamiento</item>
         <item>• Planes, ejercicios, series, repeticiones y peso levantado</item>
         <item>• Fecha y duración de tus sesiones, e historial de progreso</item>
-        <item>La App no recaba tu ubicación, contactos, fotos ni datos de salud de tu dispositivo. El inicio de sesión con Google de esta versión es una simulación y no recibe datos de Google.</item>
+        <item>### Datos de actividad (solo con tu permiso)</item>
+        <item>• Pasos, distancia, calorías activas y ritmo cardiaco del día, que la App lee de Health Connect (Android) o de la app Salud mediante HealthKit (iPhone). Ver la sección 5.</item>
+        <item>La App no recaba tu ubicación, contactos ni fotos, y no lee ningún otro dato de salud. El inicio de sesión con Google de esta versión es una simulación y no recibe datos de Google.</item>
         <item>## 3. Para qué se usan tus datos</item>
         <item>• Crear tu cuenta y permitirte iniciar y cerrar sesión.</item>
         <item>• Guardar tus planes y entrenamientos y mostrarte tu progreso.</item>
         <item>• Mostrar los pesos en la unidad que elegiste.</item>
+        <item>• Mostrarte tu actividad del día en Inicio y en Actividad, si diste permiso para leerla.</item>
         <item>No usamos tus datos para publicidad, no los vendemos y no los compartimos con terceros.</item>
         <item>## 4. Dónde se guardan tus datos</item>
         <item>Todos tus datos se guardan únicamente en una base de datos local dentro de tu dispositivo. La App no tiene servidores propios y no envía tus datos personales a ningún servidor.</item>
         <item>Cerrar sesión no borra tus datos del dispositivo. Para eliminarlos por completo, borra los datos de la App desde los ajustes de tu dispositivo o desinstálala.</item>
-        <item>## 5. Catálogo de ejercicios (ExerciseDB)</item>
+        <item>## 5. Datos de Health Connect y HealthKit</item>
+        <item>Solo si tú das permiso, la App lee de Health Connect (Android) o de HealthKit (iPhone) tus pasos, distancia, calorías activas y ritmo cardiaco del día. Pide únicamente permisos de lectura de esos cuatro datos y nunca escribe ni modifica tus datos de salud.</item>
+        <item>Esos datos solo se muestran en tu dispositivo: la App no los guarda en su base de datos, no los envía a ningún servidor y no los comparte con nadie. Se vuelven a leer cada vez que abres la pantalla.</item>
+        <item>Puedes negar el permiso y la App sigue funcionando sin estos datos. También puedes quitarlo cuando quieras: en Android, desde los ajustes de Health Connect; en iPhone, desde la app Salud (Perfil, Apps, Velok).</item>
+        <item>## 6. Catálogo de ejercicios (ExerciseDB)</item>
         <item>Para mostrar el catálogo, la App descarga la lista de ejercicios y sus imágenes desde ExerciseDB (servicio gratuito de AscendAPI), fuente de los datos e imágenes del catálogo. Esas solicitudes no incluyen tus datos personales. Como en cualquier conexión a internet, ese servicio puede recibir datos técnicos de la conexión, como tu dirección IP; su tratamiento se rige por las políticas de AscendAPI.</item>
-        <item>## 6. Tus derechos (ARCO)</item>
+        <item>## 7. Tus derechos (ARCO)</item>
         <item>Tienes derecho a acceder a tus datos, rectificarlos, cancelarlos u oponerte a su tratamiento (derechos ARCO), así como a revocar tu consentimiento.</item>
         <item>• Acceso y rectificación: puedes ver y cambiar tus datos de entrenamiento y tu unidad de peso dentro de la App.</item>
         <item>• Cancelación: puedes eliminar tus datos borrando los datos de la App o desinstalándola.</item>
+        <item>• Oposición y revocación para los datos de actividad: quita el permiso de Velok en Health Connect o en la app Salud; la App dejará de leerlos de inmediato.</item>
         <item>• Para cualquier otra solicitud, escribe a bgep7u7@icloud.com indicando tu nombre y lo que solicitas. Responderemos en un plazo de 20 días hábiles contados a partir de la recepción de tu solicitud.</item>
-        <item>## 7. Cambios a este aviso</item>
+        <item>## 8. Cambios a este aviso</item>
         <item>Podemos actualizar este aviso de privacidad. Publicaremos la nueva versión en la App con su fecha de actualización y, si el cambio es importante, te lo avisaremos dentro de la App.</item>
-        <item>## 8. Contacto</item>
+        <item>## 9. Contacto</item>
         <item>Para dudas sobre este aviso o sobre el tratamiento de tus datos, escribe a bgep7u7@icloud.com.</item>
     </string-array>
 </resources>

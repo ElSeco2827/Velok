@@ -33,6 +33,8 @@ import com.velok.app.presentation.util.icono
 import com.velok.app.presentation.util.valorFormateado
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import velok.shared.generated.resources.Res
+import velok.shared.generated.resources.sin_datos_salud
 
 /**
  * Tarjeta de una métrica: ícono, etiqueta, valor y mini gráfica.
@@ -48,9 +50,11 @@ fun MetricaCard(
     val colores = VelokTheme.colores
     val etiqueta = stringResource(metrica.tipo.etiqueta)
     val valor = metrica.valorFormateado()
+    // El lector de pantalla dice "sin datos" en lugar de leer "--".
+    val valorLeido = if (metrica.valor == null) stringResource(Res.string.sin_datos_salud) else valor
 
     Surface(
-        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = "$etiqueta: $valor" },
+        modifier = modifier.semantics(mergeDescendants = true) { contentDescription = "$etiqueta: $valorLeido" },
         shape = VelokTheme.formas.medium,
         color = if (alterna) colores.superficieAlterna else colores.superficie,
         border = if (alterna) null else BorderStroke(1.dp, colores.borde),
@@ -93,12 +97,15 @@ fun MetricaCard(
                 modifier = Modifier.fillMaxWidth(),
             )
             Spacer(Modifier.height(6.dp))
-            MiniGraficaArea(
-                valores = metrica.historial,
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .size(width = 48.dp, height = 18.dp),
-            )
+            val tamanoGrafica = Modifier
+                .align(Alignment.CenterHorizontally)
+                .size(width = 48.dp, height = 18.dp)
+            // Sin datos no se dibuja la gráfica: una línea en 0 parecería una medición real.
+            if (metrica.valor != null && metrica.historial.size >= 2) {
+                MiniGraficaArea(valores = metrica.historial, modifier = tamanoGrafica)
+            } else {
+                Spacer(tamanoGrafica)
+            }
         }
     }
 }
