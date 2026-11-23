@@ -22,6 +22,7 @@ vistas, capas (arquitectura), modelo de negocio, multiplataforma y funcionalidad
   composeResources (`Res.getUri`) en los ejercicios de ejemplo y GIF remotos en los de ExerciseDB.
   **Los GIF se animan solo en Android** (coil-gif); en iOS se muestran como imagen fija porque
   coil-gif no se publica para iOS (limitación de Coil, ver `agregarDecodificadorGif`).
+- Android: `minSdk` 26 (mínimo de la librería de Health Connect), `compileSdk`/`targetSdk` 37.
 - Red: **Ktor client** con motor por plataforma (`motorHttp()`: OkHttp en Android, Darwin en iOS) y
   `kotlinx-serialization-json`.
 - ViewModels de `lifecycle-viewmodel` multiplataforma con `StateFlow<XxxUiState>`.
@@ -84,8 +85,30 @@ Reglas:
   `IniciarSesionUseCase`, que inicia una sesión de **entrenamiento**.
 - Código específico de plataforma solo en `androidMain` / `iosMain` vía `expect/actual`.
   `Platform` es el ejemplo evaluado: se muestra en la pantalla de Perfil; no eliminarlo. Otros
-  ejemplos: `moduloPlataforma()` (ruta de la base de datos), el hash de contraseñas, `motorHttp()`
-  y `agregarDecodificadorGif()`.
+  ejemplos: `moduloPlataforma()` (ruta de la base de datos), el hash de contraseñas, `motorHttp()`,
+  `agregarDecodificadorGif()`, `moduloSalud()` (Health Connect / HealthKit) y
+  `rememberSolicitarPermisosSalud()`.
+
+## Datos de salud (Health Connect / HealthKit)
+- **Solo lectura** de pasos, distancia, calorías activas y ritmo cardiaco del día. La app nunca
+  escribe datos de salud ni pide permisos de escritura (salvo la pantalla de datos de prueba, que
+  solo existe en `androidApp/src/debug`). Pedir solo los permisos que se usan; al agregar un tipo,
+  actualizar `PERMISOS_HEALTH_CONNECT`, el manifest, `HealthKitVelok.tiposLectura` y el Aviso de
+  privacidad.
+- `ActividadRepository` tiene una implementación por plataforma (`moduloSalud()`):
+  `HealthConnectActividadRepository` (androidMain) y `HealthKitActividadRepository` (iosMain).
+  `MockActividadRepository` solo para pruebas y vistas previas.
+- Los datos de salud **no se guardan** en la base de datos ni se envían a ningún servidor: se leen
+  cada vez y solo se muestran. Revisar el acceso (`obtenerAcceso`) antes de cada lectura.
+- La tarjeta nunca muestra números inventados: sin permiso ofrece "Conectar datos de salud"; si lo
+  rechazan, un mensaje y la app sigue; sin Health Connect, abrir la tienda. Sin datos de una
+  métrica: `null` en el dominio y "--" en pantalla (nunca "0 lpm").
+- Meta del anillo: `META_PASOS_DIARIOS` = 8,000 pasos, valor de referencia (no recomendación
+  médica). Cálculos puros en `domain/model/Salud.kt` (`progresoDelDia`, `aMetricas`).
+- Android: Google exige mostrar el Aviso de privacidad desde el diálogo de permisos
+  (`PoliticaPrivacidadSaludActivity` + `activity-alias` en el manifest).
+- iOS: Apple no dice si el usuario negó la lectura; solo si ya se pidió. Si la negó, los datos
+  llegan vacíos y se muestran como "--".
 
 ## Persistencia local
 - **Room KMP** (`room`, `ksp`, `sqlite-bundled` en `libs.versions.toml`) con `BundledSQLiteDriver`;
