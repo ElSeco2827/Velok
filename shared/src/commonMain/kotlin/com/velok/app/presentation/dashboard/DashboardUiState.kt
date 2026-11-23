@@ -1,13 +1,13 @@
 package com.velok.app.presentation.dashboard
 
-import com.velok.app.domain.model.ActividadDiaria
-import com.velok.app.domain.model.Metrica
 import com.velok.app.domain.model.Plan
+import com.velok.app.presentation.salud.EstadoTarjetaSalud
 
+/**
+ * @property salud la tarjeta de actividad tiene su propio estado: si los datos de salud fallan o
+ *   no hay permiso, los planes se siguen mostrando.
+ */
 data class DashboardUiState(
-    val cargando: Boolean = true,
-    val error: Boolean = false,
-    val actividad: ActividadDiaria? = null,
-    val metricas: List<Metrica> = emptyList(),
+    val salud: EstadoTarjetaSalud = EstadoTarjetaSalud(),
     val planes: List<Plan> = emptyList(),
 )

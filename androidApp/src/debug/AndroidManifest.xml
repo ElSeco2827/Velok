@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  SOLO DEBUG: este manifest se combina con el principal únicamente en la versión debug. La versión
+  release no tiene la pantalla de datos de prueba ni los permisos de escritura de Health Connect.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Escritura solo para insertar datos de prueba en el emulador. -->
+    <uses-permission android:name="android.permission.health.WRITE_STEPS" />
+    <uses-permission android:name="android.permission.health.WRITE_DISTANCE" />
+    <uses-permission android:name="android.permission.health.WRITE_ACTIVE_CALORIES_BURNED" />
+    <uses-permission android:name="android.permission.health.WRITE_HEART_RATE" />
+
+    <application>
+        <!--
+          Se abre con: adb shell am start -n com.velok.app/.depuracion.DatosPruebaSaludActivity
+          exported="true" para que adb pueda abrirla; no tiene ícono en el lanzador.
+        -->
+        <activity
+            android:name=".depuracion.DatosPruebaSaludActivity"
+            android:exported="true"
+            android:label="@string/depuracion_titulo" />
+    </application>
+
+</manifest>

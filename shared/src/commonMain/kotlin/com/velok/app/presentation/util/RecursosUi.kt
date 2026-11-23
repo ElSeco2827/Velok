@@ -85,6 +85,7 @@ import velok.shared.generated.resources.rango_mes
 import velok.shared.generated.resources.rango_semana
 import velok.shared.generated.resources.rango_tres_dias
 import velok.shared.generated.resources.rango_tres_meses
+import velok.shared.generated.resources.sin_dato
 import velok.shared.generated.resources.valor_calorias
 import velok.shared.generated.resources.valor_distancia
 import velok.shared.generated.resources.valor_pasos
@@ -192,13 +193,19 @@ val TipoMetrica.icono: DrawableResource
         TipoMetrica.RITMO_CARDIACO -> Res.drawable.ic_ritmo_cardiaco
     }
 
-/** Valor de la métrica con su unidad: "160 kcal", "2,032", "1.5 km", "90 lpm". */
+/**
+ * Valor de la métrica con su unidad: "160 kcal", "2,032", "1.5 km", "90 lpm". Sin datos: "--"
+ * (nunca "0 lpm", que parecería una medición real).
+ */
 @Composable
-fun Metrica.valorFormateado(): String = when (tipo) {
-    TipoMetrica.CALORIAS -> stringResource(Res.string.valor_calorias, formatearMiles(valor.roundToLong()))
-    TipoMetrica.PASOS -> stringResource(Res.string.valor_pasos, formatearMiles(valor.roundToLong()))
-    TipoMetrica.DISTANCIA -> stringResource(Res.string.valor_distancia, formatearDecimal(valor, 1))
-    TipoMetrica.RITMO_CARDIACO -> stringResource(Res.string.valor_ritmo_cardiaco, formatearMiles(valor.roundToLong()))
+fun Metrica.valorFormateado(): String {
+    val v = valor ?: return stringResource(Res.string.sin_dato)
+    return when (tipo) {
+        TipoMetrica.CALORIAS -> stringResource(Res.string.valor_calorias, formatearMiles(v.roundToLong()))
+        TipoMetrica.PASOS -> stringResource(Res.string.valor_pasos, formatearMiles(v.roundToLong()))
+        TipoMetrica.DISTANCIA -> stringResource(Res.string.valor_distancia, formatearDecimal(v, 1))
+        TipoMetrica.RITMO_CARDIACO -> stringResource(Res.string.valor_ritmo_cardiaco, formatearMiles(v.roundToLong()))
+    }
 }
 
 /** Nombre del plan o "Plan sin nombre" si el usuario no le puso uno. */

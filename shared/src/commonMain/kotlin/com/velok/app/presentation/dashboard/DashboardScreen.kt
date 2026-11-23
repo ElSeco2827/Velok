@@ -28,14 +28,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.velok.app.domain.model.ActividadDiaria
+import com.velok.app.domain.model.ActividadSalud
 import com.velok.app.domain.model.Metrica
 import com.velok.app.domain.model.Plan
 import com.velok.app.domain.model.TipoCategoria
 import com.velok.app.domain.model.TipoMetrica
-import com.velok.app.presentation.components.EstadoCargando
-import com.velok.app.presentation.components.EstadoError
 import com.velok.app.presentation.components.PlanCard
-import com.velok.app.presentation.components.TarjetaActividadDiaria
+import com.velok.app.presentation.components.TarjetaActividadSalud
+import com.velok.app.presentation.salud.AccionesSalud
+import com.velok.app.presentation.salud.EstadoTarjetaSalud
+import com.velok.app.presentation.salud.rememberAccionesSalud
 import com.velok.app.presentation.theme.VelokTheme
 import kotlinx.datetime.LocalDate
 import org.jetbrains.compose.resources.stringResource
@@ -51,9 +53,11 @@ fun DashboardScreen(
     viewModel: DashboardViewModel = koinViewModel(),
 ) {
     val estado by viewModel.estado.collectAsStateWithLifecycle()
+    // Permisos y tienda dependen de la plataforma (Health Connect / HealthKit).
+    val accionesSalud = rememberAccionesSalud(recargar = viewModel::cargarSalud)
     DashboardContenido(
         estado = estado,
-        onReintentar = viewModel::cargar,
+        accionesSalud = accionesSalud,
         onVerTodosPlanes = onVerTodosPlanes,
         onAbrirPlan = onAbrirPlan,
     )
@@ -62,28 +66,24 @@ fun DashboardScreen(
 @Composable
 fun DashboardContenido(
     estado: DashboardUiState,
-    onReintentar: () -> Unit,
+    accionesSalud: AccionesSalud,
     onVerTodosPlanes: () -> Unit,
     onAbrirPlan: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    when {
-        estado.cargando -> EstadoCargando(modifier)
-        estado.error || estado.actividad == null -> EstadoError(onReintentar, modifier)
-        else -> Column(
-            modifier = modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .padding(vertical = 16.dp),
-        ) {
-            TarjetaActividadDiaria(
-                actividad = estado.actividad,
-                metricas = estado.metricas,
-                modifier = Modifier.padding(horizontal = 16.dp),
-            )
-            Spacer(Modifier.height(32.dp))
-            SeccionPlanes(planes = estado.planes, onVerTodos = onVerTodosPlanes, onAbrirPlan = onAbrirPlan)
-        }
+    Column(
+        modifier = modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())
+            .padding(vertical = 16.dp),
+    ) {
+        TarjetaActividadSalud(
+            estado = estado.salud,
+            acciones = accionesSalud,
+            modifier = Modifier.padding(horizontal = 16.dp),
+        )
+        Spacer(Modifier.height(32.dp))
+        SeccionPlanes(planes = estado.planes, onVerTodos = onVerTodosPlanes, onAbrirPlan = onAbrirPlan)
     }
 }
 
@@ -131,20 +131,24 @@ private fun DashboardContenidoPreview() {
         Surface(color = VelokTheme.colores.fondo) {
             DashboardContenido(
                 estado = DashboardUiState(
-                    cargando = false,
-                    actividad = ActividadDiaria(LocalDate(2026, 10, 12), 0.7f),
-                    metricas = listOf(
-                        Metrica(TipoMetrica.CALORIAS, 160.0, listOf(2f, 3f, 2.5f, 5f, 4f, 7f)),
-                        Metrica(TipoMetrica.PASOS, 2032.0, listOf(1f, 2f, 4f, 3f, 5f, 8f)),
-                        Metrica(TipoMetrica.DISTANCIA, 1.5, listOf(3f, 2f, 4f, 3.5f, 6f, 8f)),
-                        Metrica(TipoMetrica.RITMO_CARDIACO, 90.0, listOf(5f, 7f, 6f, 8f, 6f, 7f)),
+                    salud = EstadoTarjetaSalud(
+                        cargando = false,
+                        actividad = ActividadSalud.Datos(
+                            ActividadDiaria(LocalDate(2026, 10, 12), 0.7f, pasos = 5_600),
+                            listOf(
+                                Metrica(TipoMetrica.CALORIAS, 160.0, listOf(2f, 3f, 2.5f, 5f, 4f, 7f)),
+                                Metrica(TipoMetrica.PASOS, 5_600.0, listOf(1f, 2f, 4f, 3f, 5f, 8f)),
+                                Metrica(TipoMetrica.DISTANCIA, 4.1, listOf(3f, 2f, 4f, 3.5f, 6f, 8f)),
+                                Metrica(TipoMetrica.RITMO_CARDIACO, 90.0, listOf(5f, 7f, 6f, 8f, 6f, 7f)),
+                            ),
+                        ),
                     ),
                     planes = listOf(
                         Plan("plan-lunes", "Set del Lunes", TipoCategoria.PECHO, "", LocalDate(2026, 10, 12), emptyList()),
                         Plan("plan-martes", "Set del Martes", TipoCategoria.ESPALDA, "", LocalDate(2026, 10, 13), emptyList()),
                     ),
                 ),
-                onReintentar = {},
+                accionesSalud = AccionesSalud(),
                 onVerTodosPlanes = {},
                 onAbrirPlan = {},
             )

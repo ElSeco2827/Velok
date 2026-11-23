@@ -11,6 +11,7 @@ actual fun ComponentRegistry.Builder.agregarDecodificadorGif() {
         // Decodificador del sistema (ImageDecoder), más eficiente; existe desde Android 9.
         add(AnimatedImageDecoder.Factory())
     } else {
+        // Android 8.x (minSdk 26-27).
         add(GifDecoder.Factory())
     }
 }

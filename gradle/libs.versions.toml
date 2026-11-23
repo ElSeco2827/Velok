@@ -1,7 +1,9 @@
 [versions]
 agp = "9.3.3"
 android-compileSdk = "37"
-android-minSdk = "24"
+# 26 (Android 8.0): mínimo de la librería de Health Connect. La app de Health Connect necesita
+# Android 9 (28); en 26-27 la app muestra que los datos de salud no están disponibles.
+android-minSdk = "26"
 android-targetSdk = "37"
 androidx-activity = "1.13.0"
 androidx-appcompat = "1.8.0"
@@ -30,6 +32,8 @@ androidx-test-core = "1.7.0"
 kotlinx-coroutines = "1.10.2"
 # Cliente HTTP multiplataforma (API de ExerciseDB y descarga de imágenes con Coil).
 ktor = "3.6.1"
+# Última estable (1.2.0 sigue en alpha). Solo Android; en iOS se usa HealthKit del sistema.
+health-connect = "1.1.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -66,6 +70,7 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-okhttp = { module = "io.ktor:ktor-client-okhttp", version.ref = "ktor" }
 ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+health-connect-client = { module = "androidx.health.connect:connect-client", version.ref = "health-connect" }
 room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
 sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
